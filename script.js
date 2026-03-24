@@ -6,12 +6,16 @@ const birthMonthInput = document.querySelector("#birth-month");
 const birthYearInput = document.querySelector("#birth-year");
 const weeksGrid = document.querySelector("#weeks-grid");
 const yearLabels = document.querySelector("#year-labels");
+const jumpTodayButton = document.querySelector("#jump-today");
+const printPosterButton = document.querySelector("#print-poster");
 const currentAgeValue = document.querySelector("#current-age");
+const yearOfLifeValue = document.querySelector("#year-of-life");
 const weeksLivedValue = document.querySelector("#weeks-lived");
 const weeksLeftValue = document.querySelector("#weeks-left");
 const lifePercentValue = document.querySelector("#life-percent");
 const posterNote = document.querySelector("#poster-note");
 const posterHelper = document.querySelector("#poster-helper");
+const progressFill = document.querySelector("#progress-fill");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(value);
@@ -98,8 +102,11 @@ function updateGrid(livedWeeks) {
   for (let index = 0; index < cells.length; index += 1) {
     const cell = cells[index];
     const lived = index < livedWeeks;
+    const current = index === livedWeeks && livedWeeks < TOTAL_WEEKS;
     cell.classList.toggle("lived", lived);
-    cell.classList.toggle("future", !lived);
+    cell.classList.toggle("current", current);
+    cell.classList.toggle("future", !lived && !current);
+    cell.title = current ? `Current week: ${index + 1}` : `Week ${index + 1}`;
   }
 }
 
@@ -107,11 +114,14 @@ function updateStats(livedWeeks, ageInYears = 0) {
   const clampedLivedWeeks = Math.min(Math.max(livedWeeks, 0), TOTAL_WEEKS);
   const remainingWeeks = Math.max(TOTAL_WEEKS - clampedLivedWeeks, 0);
   const lifeUsedPercent = (clampedLivedWeeks / TOTAL_WEEKS) * 100;
+  const currentYearOfLife = Math.min(Math.floor(clampedLivedWeeks / WEEKS_PER_YEAR) + 1, Math.ceil(TOTAL_WEEKS / WEEKS_PER_YEAR));
 
   currentAgeValue.textContent = `${formatNumber(ageInYears)} years`;
+  yearOfLifeValue.textContent = `Year ${formatNumber(currentYearOfLife)} of 88`;
   weeksLivedValue.textContent = formatNumber(clampedLivedWeeks);
   weeksLeftValue.textContent = formatNumber(remainingWeeks);
   lifePercentValue.textContent = `${lifeUsedPercent.toFixed(1)}%`;
+  progressFill.style.width = `${lifeUsedPercent}%`;
 
   if (livedWeeks > TOTAL_WEEKS) {
     const extraWeeks = livedWeeks - TOTAL_WEEKS;
@@ -161,9 +171,13 @@ function updateLifeView() {
 function setDefaultBirthdate() {
   const defaultDate = new Date();
   defaultDate.setFullYear(defaultDate.getFullYear() - 30);
-  birthDayInput.value = String(defaultDate.getDate());
-  birthMonthInput.value = String(defaultDate.getMonth());
-  birthYearInput.value = String(defaultDate.getFullYear());
+  applyBirthdate(defaultDate);
+}
+
+function applyBirthdate(date) {
+  birthDayInput.value = String(date.getDate());
+  birthMonthInput.value = String(date.getMonth());
+  birthYearInput.value = String(date.getFullYear());
 }
 
 setupBirthdateFields();
@@ -174,4 +188,13 @@ updateLifeView();
 
 [birthDayInput, birthMonthInput, birthYearInput].forEach((field) => {
   field.addEventListener("change", updateLifeView);
+});
+
+jumpTodayButton.addEventListener("click", () => {
+  setDefaultBirthdate();
+  updateLifeView();
+});
+
+printPosterButton.addEventListener("click", () => {
+  window.print();
 });
