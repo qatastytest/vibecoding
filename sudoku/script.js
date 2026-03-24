@@ -256,8 +256,9 @@ function updateBoardFitSize() {
   const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   const containerWidth = boardShell.clientWidth;
   const bottomPadding = 44;
+  const horizontalSafety = 18;
   const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
-  const fitSize = Math.max(220, Math.min(containerWidth, availableHeight) - 8);
+  const fitSize = Math.max(220, Math.min(containerWidth - horizontalSafety, availableHeight) - 4);
   sudokuGrid.style.width = `${fitSize}px`;
   sudokuGrid.style.height = `${fitSize}px`;
 }
