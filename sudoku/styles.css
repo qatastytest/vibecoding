@@ -678,7 +678,7 @@ h3 {
 
 @media (max-width: 720px) {
   :root {
-    --grid-size: min(94vw, 520px);
+    --grid-size: min(94vw, max(288px, calc(100svh - 470px)));
   }
 
   .page {
@@ -708,7 +708,7 @@ h3 {
   }
 
   .hero {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .eyebrow {
@@ -720,9 +720,9 @@ h3 {
   }
 
   .intro {
-    margin-top: 10px;
-    font-size: 0.96rem;
-    line-height: 1.65;
+    margin-top: 8px;
+    font-size: 0.92rem;
+    line-height: 1.5;
   }
 
   .panel-header {
@@ -738,13 +738,13 @@ h3 {
   .stats-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
-    margin-top: 16px;
+    margin-top: 12px;
   }
 
   .stat-chip {
     min-width: 0;
-    min-height: 80px;
-    padding: 10px 8px;
+    min-height: 72px;
+    padding: 8px 8px;
     border-radius: 16px;
     text-align: center;
   }
@@ -779,12 +779,12 @@ h3 {
   .quick-actions {
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .quick-action-button {
-    min-height: 56px;
-    padding: 9px 4px;
+    min-height: 52px;
+    padding: 7px 4px;
   }
 
   .icon-glyph {
@@ -849,5 +849,39 @@ h3 {
   .best-time-row span,
   .best-time-row strong {
     font-size: 0.94rem;
+  }
+}
+
+@media (max-width: 430px) and (min-height: 780px) {
+  :root {
+    --grid-size: min(92vw, max(284px, calc(100svh - 455px)));
+  }
+
+  .top-controls-copy h3 {
+    font-size: 1.12rem;
+  }
+
+  .difficulty-list,
+  .difficulty-list-top {
+    gap: 6px;
+  }
+
+  .difficulty-button {
+    min-height: 68px;
+    padding: 8px 5px;
+  }
+
+  .difficulty-level {
+    width: 28px;
+    height: 28px;
+  }
+
+  .new-game-button {
+    min-height: 40px;
+    padding: 9px 14px;
+  }
+
+  .board-shell {
+    margin: 14px 0 12px;
   }
 }
