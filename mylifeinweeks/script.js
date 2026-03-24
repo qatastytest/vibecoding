@@ -7,7 +7,6 @@ const birthYearInput = document.querySelector("#birth-year");
 const weeksGrid = document.querySelector("#weeks-grid");
 const yearLabels = document.querySelector("#year-labels");
 const jumpTodayButton = document.querySelector("#jump-today");
-const printPosterButton = document.querySelector("#print-poster");
 const currentAgeValue = document.querySelector("#current-age");
 const yearOfLifeValue = document.querySelector("#year-of-life");
 const weeksLivedValue = document.querySelector("#weeks-lived");
@@ -193,8 +192,4 @@ updateLifeView();
 jumpTodayButton.addEventListener("click", () => {
   setDefaultBirthdate();
   updateLifeView();
-});
-
-printPosterButton.addEventListener("click", () => {
-  window.print();
 });

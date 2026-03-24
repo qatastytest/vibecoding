@@ -429,29 +429,3 @@ select:focus,
     grid-template-columns: 1fr;
   }
 }
-
-@media print {
-  body {
-    background: #fff;
-  }
-
-  body::before,
-  .dashboard,
-  .legend,
-  .poster-helper {
-    display: none !important;
-  }
-
-  .page {
-    width: auto;
-    padding: 0;
-  }
-
-  .poster {
-    margin: 0;
-    box-shadow: none;
-    border: 0;
-    padding: 0;
-    background: #fff;
-  }
-}
