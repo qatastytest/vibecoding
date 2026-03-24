@@ -134,6 +134,11 @@ h3 {
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
+.score-pill.pulse {
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 14px 28px rgba(238, 141, 50, 0.22);
+}
+
 .score-pill strong {
   display: block;
   margin-top: 4px;
@@ -142,6 +147,9 @@ h3 {
 }
 
 .mute-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   min-height: 46px;
   padding: 12px 16px;
   border-radius: 999px;
@@ -158,6 +166,24 @@ h3 {
 }
 
 .mute-button.muted {
+  background: rgba(18, 33, 44, 0.08);
+  color: var(--muted);
+}
+
+.mute-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(238, 141, 50, 0.14);
+  color: var(--accent-strong);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.mute-button.muted .mute-indicator {
   background: rgba(18, 33, 44, 0.08);
   color: var(--muted);
 }

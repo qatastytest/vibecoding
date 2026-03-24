@@ -24,9 +24,12 @@
           <h2 id="game-title">One more run</h2>
         </div>
         <div class="hud" aria-live="polite">
-          <button class="mute-button" id="mute-button" type="button" aria-pressed="false">Sound: On</button>
+          <button class="mute-button" id="mute-button" type="button" aria-label="Toggle sound" aria-pressed="false">
+            <span class="mute-indicator" id="mute-indicator" aria-hidden="true">))</span>
+            <span id="mute-label">Sound On</span>
+          </button>
           <div class="score-strip">
-            <div class="score-pill">
+            <div class="score-pill" id="score-pill">
               <span class="score-label">Score</span>
               <strong id="score-value">0</strong>
             </div>

@@ -22,6 +22,9 @@ const playOverlay = document.querySelector("#play-overlay");
 const gameoverOverlay = document.querySelector("#gameover-overlay");
 const restartButton = document.querySelector("#restart-button");
 const muteButton = document.querySelector("#mute-button");
+const muteIndicator = document.querySelector("#mute-indicator");
+const muteLabel = document.querySelector("#mute-label");
+const scorePill = document.querySelector("#score-pill");
 const scoreValue = document.querySelector("#score-value");
 const bestScoreValue = document.querySelector("#best-score-value");
 const finalScoreValue = document.querySelector("#final-score-value");
@@ -45,6 +48,8 @@ const state = {
   scorePulse: 0,
   shakeTime: 0,
   shakeStrength: 0,
+  flashTime: 0,
+  flashColor: "#ffffff",
   muted: false,
   clouds: [
     { x: 70, y: 105, width: 90, speed: 10 },
@@ -57,6 +62,7 @@ const state = {
 const audioState = {
   context: null,
   unlocked: false,
+  resumePromise: null,
 };
 
 function loadBestScore() {
@@ -94,9 +100,10 @@ function saveMutedPreference(value) {
 }
 
 function syncMuteUI() {
-  muteButton.textContent = state.muted ? "Sound: Off" : "Sound: On";
+  muteLabel.textContent = state.muted ? "Sound Off" : "Sound On";
+  muteIndicator.textContent = state.muted ? "x" : "))";
   muteButton.classList.toggle("muted", state.muted);
-  muteButton.setAttribute("aria-pressed", String(state.muted));
+  muteButton.setAttribute("aria-pressed", String(!state.muted));
 }
 
 function ensureAudioContext() {
@@ -116,14 +123,26 @@ function ensureAudioContext() {
 function unlockAudio() {
   const audioContext = ensureAudioContext();
   if (!audioContext) {
-    return;
+    return Promise.resolve();
   }
 
-  if (audioContext.state === "suspended") {
-    audioContext.resume().catch(() => {});
+  if (audioContext.state === "running") {
+    audioState.unlocked = true;
+    return Promise.resolve();
   }
 
-  audioState.unlocked = true;
+  if (!audioState.resumePromise) {
+    audioState.resumePromise = audioContext.resume()
+      .then(() => {
+        audioState.unlocked = true;
+      })
+      .catch(() => {})
+      .finally(() => {
+        audioState.resumePromise = null;
+      });
+  }
+
+  return audioState.resumePromise;
 }
 
 function playTone({ frequency, duration, type = "sine", volume = 0.04, frequencyEnd = frequency }) {
@@ -132,7 +151,16 @@ function playTone({ frequency, duration, type = "sine", volume = 0.04, frequency
   }
 
   const audioContext = ensureAudioContext();
-  if (!audioContext || !audioState.unlocked) {
+  if (!audioContext) {
+    return;
+  }
+
+  if (audioContext.state !== "running") {
+    unlockAudio().then(() => {
+      if (audioContext.state === "running" && !state.muted) {
+        playTone({ frequency, duration, type, volume, frequencyEnd });
+      }
+    });
     return;
   }
 
@@ -184,6 +212,8 @@ function resetRun() {
   state.scorePulse = 0;
   state.shakeTime = 0;
   state.shakeStrength = 0;
+  state.flashTime = 0;
+  state.flashColor = "#ffffff";
   state.bird.x = BIRD_X;
   state.bird.y = GAME_HEIGHT * 0.42;
   state.bird.velocityY = 0;
@@ -205,6 +235,8 @@ function startRun() {
   state.scorePulse = 0;
   state.shakeTime = 0;
   state.shakeStrength = 0;
+  state.flashTime = 0;
+  state.flashColor = "#ffffff";
   state.bird.x = BIRD_X;
   state.bird.y = GAME_HEIGHT * 0.42;
   state.bird.velocityY = FLAP_VELOCITY;
@@ -233,7 +265,8 @@ function endRun() {
     state.bestScore = state.score;
     saveBestScore(state.bestScore);
   }
-  triggerScreenShake(0.32, 12);
+  triggerScreenShake(0.42, 18);
+  triggerFlash("#ffffff", 0.12);
   spawnImpactParticles();
   playHitSound();
   playOverlay.classList.remove("play-overlay-visible");
@@ -262,14 +295,14 @@ function spawnParticles(count, configFactory) {
 }
 
 function spawnFlapParticles() {
-  spawnParticles(7, () => ({
+  spawnParticles(12, () => ({
     x: state.bird.x - 18,
-    y: state.bird.y + (Math.random() * 14 - 7),
-    velocityX: -90 - Math.random() * 70,
-    velocityY: Math.random() * 80 - 40,
-    radius: 3 + Math.random() * 3,
-    life: 0.32 + Math.random() * 0.1,
-    maxLife: 0.42,
+    y: state.bird.y + (Math.random() * 18 - 9),
+    velocityX: -120 - Math.random() * 90,
+    velocityY: Math.random() * 120 - 60,
+    radius: 4 + Math.random() * 4,
+    life: 0.38 + Math.random() * 0.12,
+    maxLife: 0.52,
     color: Math.random() > 0.4 ? "#ffffff" : "#ffd34d",
   }));
 }
@@ -277,27 +310,27 @@ function spawnFlapParticles() {
 function spawnScoreParticles(pipe) {
   const particleX = pipe.x + (PIPE_WIDTH * 0.5);
   const particleY = pipe.gapY;
-  spawnParticles(10, () => ({
+  spawnParticles(18, () => ({
     x: particleX + (Math.random() * 24 - 12),
     y: particleY + (Math.random() * 20 - 10),
-    velocityX: -20 + Math.random() * 40,
-    velocityY: -60 + Math.random() * 120,
-    radius: 2 + Math.random() * 3,
-    life: 0.45 + Math.random() * 0.2,
-    maxLife: 0.6,
+    velocityX: -50 + Math.random() * 100,
+    velocityY: -110 + Math.random() * 180,
+    radius: 3 + Math.random() * 4,
+    life: 0.52 + Math.random() * 0.24,
+    maxLife: 0.76,
     color: Math.random() > 0.5 ? "#fff8c6" : "#ffd34d",
   }));
 }
 
 function spawnImpactParticles() {
-  spawnParticles(16, () => ({
+  spawnParticles(26, () => ({
     x: state.bird.x + (Math.random() * 18 - 9),
     y: state.bird.y + (Math.random() * 18 - 9),
-    velocityX: -120 + Math.random() * 240,
-    velocityY: -120 + Math.random() * 240,
-    radius: 3 + Math.random() * 4,
-    life: 0.4 + Math.random() * 0.18,
-    maxLife: 0.58,
+    velocityX: -170 + Math.random() * 340,
+    velocityY: -170 + Math.random() * 340,
+    radius: 4 + Math.random() * 5,
+    life: 0.48 + Math.random() * 0.2,
+    maxLife: 0.72,
     color: Math.random() > 0.55 ? "#ffffff" : "#f8922b",
   }));
 }
@@ -305,6 +338,11 @@ function spawnImpactParticles() {
 function triggerScreenShake(duration, strength) {
   state.shakeTime = duration;
   state.shakeStrength = strength;
+}
+
+function triggerFlash(color, duration) {
+  state.flashColor = color;
+  state.flashTime = duration;
 }
 
 function handleInput() {
@@ -365,6 +403,11 @@ function updatePipes(deltaTime) {
       pipe.scored = true;
       state.score += 1;
       state.scorePulse = 1;
+      scorePill.classList.remove("pulse");
+      void scorePill.offsetWidth;
+      scorePill.classList.add("pulse");
+      window.setTimeout(() => scorePill.classList.remove("pulse"), 180);
+      triggerFlash("#ffe38a", 0.08);
       spawnScoreParticles(pipe);
       playScoreSound();
       if (state.score > state.bestScore) {
@@ -445,8 +488,8 @@ function updateParticles(deltaTime) {
 
     particle.x += particle.velocityX * deltaTime;
     particle.y += particle.velocityY * deltaTime;
-    particle.velocityX *= 0.98;
-    particle.velocityY += 190 * deltaTime;
+    particle.velocityX *= 0.985;
+    particle.velocityY += 240 * deltaTime;
     return true;
   });
 }
@@ -461,6 +504,10 @@ function updateFeedback(deltaTime) {
     if (state.shakeTime === 0) {
       state.shakeStrength = 0;
     }
+  }
+
+  if (state.flashTime > 0) {
+    state.flashTime = Math.max(0, state.flashTime - deltaTime);
   }
 
   updateParticles(deltaTime);
@@ -601,6 +648,17 @@ function drawParticles() {
   });
 }
 
+function drawFlashOverlay() {
+  if (state.flashTime <= 0) {
+    return;
+  }
+
+  context.globalAlpha = Math.min(state.flashTime * 4, 0.22);
+  context.fillStyle = state.flashColor;
+  context.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  context.globalAlpha = 1;
+}
+
 function drawScoreInCanvas() {
   const pulse = state.scorePulse;
   const width = 104 + pulse * 10;
@@ -631,6 +689,7 @@ function drawFrame() {
   drawParticles();
   drawBird();
   drawScoreInCanvas();
+  drawFlashOverlay();
   context.restore();
 }
 
