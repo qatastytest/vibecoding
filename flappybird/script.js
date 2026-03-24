@@ -39,6 +39,10 @@ const state = {
     wingPhase: 0,
   },
   pipes: [],
+  particles: [],
+  scorePulse: 0,
+  shakeTime: 0,
+  shakeStrength: 0,
   clouds: [
     { x: 70, y: 105, width: 90, speed: 10 },
     { x: 250, y: 155, width: 70, speed: 14 },
@@ -78,6 +82,10 @@ function resetRun() {
   state.elapsed = 0;
   state.spawnTimer = 0;
   state.pipes = [];
+  state.particles = [];
+  state.scorePulse = 0;
+  state.shakeTime = 0;
+  state.shakeStrength = 0;
   state.bird.x = BIRD_X;
   state.bird.y = GAME_HEIGHT * 0.42;
   state.bird.velocityY = 0;
@@ -95,6 +103,10 @@ function startRun() {
   state.elapsed = 0;
   state.spawnTimer = 0;
   state.pipes = [];
+  state.particles = [];
+  state.scorePulse = 0;
+  state.shakeTime = 0;
+  state.shakeStrength = 0;
   state.bird.x = BIRD_X;
   state.bird.y = GAME_HEIGHT * 0.42;
   state.bird.velocityY = FLAP_VELOCITY;
@@ -109,6 +121,7 @@ function startRun() {
 function flap() {
   state.bird.velocityY = FLAP_VELOCITY;
   state.bird.rotation = -0.45;
+  spawnFlapParticles();
 }
 
 function endRun() {
@@ -121,6 +134,8 @@ function endRun() {
     state.bestScore = state.score;
     saveBestScore(state.bestScore);
   }
+  triggerScreenShake(0.32, 12);
+  spawnImpactParticles();
   playOverlay.classList.remove("play-overlay-visible");
   syncScoreUI();
   gameoverOverlay.classList.add("overlay-visible");
@@ -138,6 +153,58 @@ function addPipePair() {
     gapY: randomPipeGapY(),
     scored: false,
   });
+}
+
+function spawnParticles(count, configFactory) {
+  for (let index = 0; index < count; index += 1) {
+    state.particles.push(configFactory(index));
+  }
+}
+
+function spawnFlapParticles() {
+  spawnParticles(7, () => ({
+    x: state.bird.x - 18,
+    y: state.bird.y + (Math.random() * 14 - 7),
+    velocityX: -90 - Math.random() * 70,
+    velocityY: Math.random() * 80 - 40,
+    radius: 3 + Math.random() * 3,
+    life: 0.32 + Math.random() * 0.1,
+    maxLife: 0.42,
+    color: Math.random() > 0.4 ? "#ffffff" : "#ffd34d",
+  }));
+}
+
+function spawnScoreParticles(pipe) {
+  const particleX = pipe.x + (PIPE_WIDTH * 0.5);
+  const particleY = pipe.gapY;
+  spawnParticles(10, () => ({
+    x: particleX + (Math.random() * 24 - 12),
+    y: particleY + (Math.random() * 20 - 10),
+    velocityX: -20 + Math.random() * 40,
+    velocityY: -60 + Math.random() * 120,
+    radius: 2 + Math.random() * 3,
+    life: 0.45 + Math.random() * 0.2,
+    maxLife: 0.6,
+    color: Math.random() > 0.5 ? "#fff8c6" : "#ffd34d",
+  }));
+}
+
+function spawnImpactParticles() {
+  spawnParticles(16, () => ({
+    x: state.bird.x + (Math.random() * 18 - 9),
+    y: state.bird.y + (Math.random() * 18 - 9),
+    velocityX: -120 + Math.random() * 240,
+    velocityY: -120 + Math.random() * 240,
+    radius: 3 + Math.random() * 4,
+    life: 0.4 + Math.random() * 0.18,
+    maxLife: 0.58,
+    color: Math.random() > 0.55 ? "#ffffff" : "#f8922b",
+  }));
+}
+
+function triggerScreenShake(duration, strength) {
+  state.shakeTime = duration;
+  state.shakeStrength = strength;
 }
 
 function handleInput() {
@@ -195,6 +262,8 @@ function updatePipes(deltaTime) {
     if (!pipe.scored && pipe.x + PIPE_WIDTH < state.bird.x) {
       pipe.scored = true;
       state.score += 1;
+      state.scorePulse = 1;
+      spawnScoreParticles(pipe);
       if (state.score > state.bestScore) {
         state.bestScore = state.score;
       }
@@ -264,8 +333,39 @@ function updateBird(deltaTime) {
   state.bird.rotation = normalizedVelocity * 0.9;
 }
 
+function updateParticles(deltaTime) {
+  state.particles = state.particles.filter((particle) => {
+    particle.life -= deltaTime;
+    if (particle.life <= 0) {
+      return false;
+    }
+
+    particle.x += particle.velocityX * deltaTime;
+    particle.y += particle.velocityY * deltaTime;
+    particle.velocityX *= 0.98;
+    particle.velocityY += 190 * deltaTime;
+    return true;
+  });
+}
+
+function updateFeedback(deltaTime) {
+  if (state.scorePulse > 0) {
+    state.scorePulse = Math.max(0, state.scorePulse - deltaTime * 4.2);
+  }
+
+  if (state.shakeTime > 0) {
+    state.shakeTime = Math.max(0, state.shakeTime - deltaTime);
+    if (state.shakeTime === 0) {
+      state.shakeStrength = 0;
+    }
+  }
+
+  updateParticles(deltaTime);
+}
+
 function updateGame(deltaTime) {
   updateClouds(deltaTime);
+  updateFeedback(deltaTime);
 
   if (state.mode !== "playing") {
     state.bird.wingPhase += deltaTime * 3;
@@ -386,22 +486,49 @@ function drawBird() {
   context.restore();
 }
 
+function drawParticles() {
+  state.particles.forEach((particle) => {
+    const alpha = particle.life / particle.maxLife;
+    context.globalAlpha = Math.max(alpha, 0);
+    context.fillStyle = particle.color;
+    context.beginPath();
+    context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+    context.fill();
+    context.globalAlpha = 1;
+  });
+}
+
 function drawScoreInCanvas() {
-  context.fillStyle = "rgba(255, 255, 255, 0.86)";
-  context.fillRect(16, 16, 104, 48);
+  const pulse = state.scorePulse;
+  const width = 104 + pulse * 10;
+  const height = 48 + pulse * 6;
+  const x = 16 - (pulse * 5);
+  const y = 16 - (pulse * 3);
+
+  context.fillStyle = pulse > 0 ? "rgba(255, 247, 201, 0.95)" : "rgba(255, 255, 255, 0.86)";
+  context.fillRect(x, y, width, height);
   context.fillStyle = "#12212c";
-  context.font = "700 30px Georgia";
+  context.font = pulse > 0 ? "700 34px Georgia" : "700 30px Georgia";
   context.textAlign = "left";
-  context.fillText(String(state.score), 30, 49);
+  context.fillText(String(state.score), x + 14, y + 33);
 }
 
 function drawFrame() {
+  context.save();
+  if (state.shakeTime > 0) {
+    const intensity = state.shakeStrength * (state.shakeTime / 0.32);
+    const shakeX = (Math.random() * 2 - 1) * intensity;
+    const shakeY = (Math.random() * 2 - 1) * intensity;
+    context.translate(shakeX, shakeY);
+  }
   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   drawBackground();
   drawPipes();
   drawGround();
+  drawParticles();
   drawBird();
   drawScoreInCanvas();
+  context.restore();
 }
 
 function gameLoop(timestamp) {

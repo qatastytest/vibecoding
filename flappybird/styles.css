@@ -123,6 +123,7 @@ h3 {
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(18, 33, 44, 0.08);
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .score-pill strong {
@@ -161,6 +162,7 @@ h3 {
 .play-overlay span {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 38px;
   padding: 10px 14px;
   border-radius: 999px;
@@ -260,5 +262,10 @@ h3 {
 
   .score-pill {
     min-width: 92px;
+  }
+
+  .play-overlay span {
+    font-size: 0.86rem;
+    text-align: center;
   }
 }
