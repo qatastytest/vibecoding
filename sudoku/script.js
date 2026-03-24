@@ -248,9 +248,9 @@ function updateBoardFitSize() {
   }
 
   const top = boardShell.getBoundingClientRect().top;
-  const viewportHeight = window.innerHeight;
+  const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   const containerWidth = boardShell.clientWidth;
-  const bottomPadding = 8;
+  const bottomPadding = 18;
   const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
   const fitSize = Math.max(220, Math.min(containerWidth, availableHeight));
   sudokuGrid.style.width = `${fitSize}px`;
@@ -658,6 +658,10 @@ window.addEventListener("resize", () => {
   updateBoardFitSize();
 });
 window.addEventListener("orientationchange", updateBoardFitSize);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", updateBoardFitSize);
+  window.visualViewport.addEventListener("scroll", updateBoardFitSize);
+}
 window.addEventListener("keydown", handleKeyInput);
 
 init();
