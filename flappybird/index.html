@@ -23,14 +23,17 @@
           <p class="panel-label">Now playing</p>
           <h2 id="game-title">One more run</h2>
         </div>
-        <div class="score-strip" aria-live="polite">
-          <div class="score-pill">
-            <span class="score-label">Score</span>
-            <strong id="score-value">0</strong>
-          </div>
-          <div class="score-pill">
-            <span class="score-label">Best</span>
-            <strong id="best-score-value">0</strong>
+        <div class="hud" aria-live="polite">
+          <button class="mute-button" id="mute-button" type="button" aria-pressed="false">Sound: On</button>
+          <div class="score-strip">
+            <div class="score-pill">
+              <span class="score-label">Score</span>
+              <strong id="score-value">0</strong>
+            </div>
+            <div class="score-pill">
+              <span class="score-label">Best</span>
+              <strong id="best-score-value">0</strong>
+            </div>
           </div>
         </div>
       </div>

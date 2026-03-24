@@ -1,4 +1,5 @@
 const STORAGE_KEY = "flappybird-best-score";
+const MUTE_STORAGE_KEY = "flappybird-muted";
 const GAME_WIDTH = 480;
 const GAME_HEIGHT = 720;
 const GROUND_HEIGHT = 112;
@@ -20,6 +21,7 @@ const readyOverlay = document.querySelector("#ready-overlay");
 const playOverlay = document.querySelector("#play-overlay");
 const gameoverOverlay = document.querySelector("#gameover-overlay");
 const restartButton = document.querySelector("#restart-button");
+const muteButton = document.querySelector("#mute-button");
 const scoreValue = document.querySelector("#score-value");
 const bestScoreValue = document.querySelector("#best-score-value");
 const finalScoreValue = document.querySelector("#final-score-value");
@@ -43,12 +45,18 @@ const state = {
   scorePulse: 0,
   shakeTime: 0,
   shakeStrength: 0,
+  muted: false,
   clouds: [
     { x: 70, y: 105, width: 90, speed: 10 },
     { x: 250, y: 155, width: 70, speed: 14 },
     { x: 390, y: 95, width: 110, speed: 8 },
   ],
   lastFrameTime: performance.now(),
+};
+
+const audioState = {
+  context: null,
+  unlocked: false,
 };
 
 function loadBestScore() {
@@ -67,6 +75,96 @@ function saveBestScore(score) {
   } catch {
     return;
   }
+}
+
+function loadMutedPreference() {
+  try {
+    return window.localStorage.getItem(MUTE_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function saveMutedPreference(value) {
+  try {
+    window.localStorage.setItem(MUTE_STORAGE_KEY, String(value));
+  } catch {
+    return;
+  }
+}
+
+function syncMuteUI() {
+  muteButton.textContent = state.muted ? "Sound: Off" : "Sound: On";
+  muteButton.classList.toggle("muted", state.muted);
+  muteButton.setAttribute("aria-pressed", String(state.muted));
+}
+
+function ensureAudioContext() {
+  if (audioState.context) {
+    return audioState.context;
+  }
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    return null;
+  }
+
+  audioState.context = new AudioContextClass();
+  return audioState.context;
+}
+
+function unlockAudio() {
+  const audioContext = ensureAudioContext();
+  if (!audioContext) {
+    return;
+  }
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume().catch(() => {});
+  }
+
+  audioState.unlocked = true;
+}
+
+function playTone({ frequency, duration, type = "sine", volume = 0.04, frequencyEnd = frequency }) {
+  if (state.muted) {
+    return;
+  }
+
+  const audioContext = ensureAudioContext();
+  if (!audioContext || !audioState.unlocked) {
+    return;
+  }
+
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  oscillator.frequency.exponentialRampToValueAtTime(Math.max(frequencyEnd, 1), now + duration);
+
+  gainNode.gain.setValueAtTime(0.0001, now);
+  gainNode.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.start(now);
+  oscillator.stop(now + duration);
+}
+
+function playFlapSound() {
+  playTone({ frequency: 420, frequencyEnd: 320, duration: 0.08, type: "triangle", volume: 0.03 });
+}
+
+function playScoreSound() {
+  playTone({ frequency: 640, frequencyEnd: 860, duration: 0.11, type: "sine", volume: 0.04 });
+}
+
+function playHitSound() {
+  playTone({ frequency: 180, frequencyEnd: 90, duration: 0.18, type: "square", volume: 0.05 });
 }
 
 function syncScoreUI() {
@@ -122,6 +220,7 @@ function flap() {
   state.bird.velocityY = FLAP_VELOCITY;
   state.bird.rotation = -0.45;
   spawnFlapParticles();
+  playFlapSound();
 }
 
 function endRun() {
@@ -136,6 +235,7 @@ function endRun() {
   }
   triggerScreenShake(0.32, 12);
   spawnImpactParticles();
+  playHitSound();
   playOverlay.classList.remove("play-overlay-visible");
   syncScoreUI();
   gameoverOverlay.classList.add("overlay-visible");
@@ -208,6 +308,8 @@ function triggerScreenShake(duration, strength) {
 }
 
 function handleInput() {
+  unlockAudio();
+
   if (state.mode === "ready") {
     startRun();
     return;
@@ -264,6 +366,7 @@ function updatePipes(deltaTime) {
       state.score += 1;
       state.scorePulse = 1;
       spawnScoreParticles(pipe);
+      playScoreSound();
       if (state.score > state.bestScore) {
         state.bestScore = state.score;
       }
@@ -541,7 +644,9 @@ function gameLoop(timestamp) {
 
 function init() {
   state.bestScore = loadBestScore();
+  state.muted = loadMutedPreference();
   syncScoreUI();
+  syncMuteUI();
   drawFrame();
   window.requestAnimationFrame(gameLoop);
 }
@@ -549,5 +654,14 @@ function init() {
 canvasFrame.addEventListener("pointerdown", onPointerInput);
 window.addEventListener("keydown", onKeyboardInput);
 restartButton.addEventListener("click", resetRun);
+muteButton.addEventListener("click", () => {
+  state.muted = !state.muted;
+  saveMutedPreference(state.muted);
+  syncMuteUI();
+  if (!state.muted) {
+    unlockAudio();
+    playTone({ frequency: 520, frequencyEnd: 640, duration: 0.07, type: "sine", volume: 0.025 });
+  }
+});
 
 init();
