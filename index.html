@@ -3,105 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Life in Weeks</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Vibecoding Projects</title>
+  <style>
+    :root {
+      --bg: #f4efe7;
+      --panel: #fffaf2;
+      --ink: #181511;
+      --muted: #6c645b;
+      --accent: #a56f2c;
+      --line: rgba(24, 21, 17, 0.08);
+      --shadow: 0 28px 72px rgba(50, 37, 20, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(165, 111, 44, 0.14), transparent 24%),
+        linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+    }
+
+    .page {
+      width: min(1100px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 56px 0 80px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.75rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.8rem, 8vw, 5rem);
+      letter-spacing: 0.08em;
+      line-height: 0.95;
+    }
+
+    .intro {
+      width: min(720px, 100%);
+      margin: 18px auto 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .projects {
+      display: grid;
+      gap: 18px;
+    }
+
+    .project-card {
+      display: grid;
+      gap: 12px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .project-card h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .project-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .link {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 1px solid var(--ink);
+      color: #fffaf2;
+      background: var(--ink);
+    }
+
+    .link.secondary {
+      background: transparent;
+      color: var(--ink);
+      border-color: rgba(24, 21, 17, 0.16);
+    }
+  </style>
 </head>
 <body>
   <main class="page">
     <section class="hero">
-      <p class="eyebrow">A life visualized, one week at a time</p>
-      <h1>MY LIFE IN WEEKS</h1>
+      <p class="eyebrow">Vibecoding</p>
+      <h1>SMALL PROJECTS, HOSTED SEPARATELY</h1>
       <p class="intro">
-        The average optimistic life span is about <strong>4576 weeks</strong>.
-        Pick a birth date and see how many have already been lived and how many still remain.
+        This repository is now a home for small experiments and tools. Each project lives in its own folder and is available
+        on GitHub Pages under its own path.
       </p>
     </section>
 
-    <section class="dashboard" aria-labelledby="birth-date-heading">
-      <form class="controls-card" id="life-form">
-        <div class="controls-copy">
-          <h2 id="birth-date-heading">Choose a birth date</h2>
-          <p>The poster updates instantly and turns each completed week into ink.</p>
+    <section class="projects">
+      <article class="project-card">
+        <h2>My Life in Weeks</h2>
+        <p>
+          A poster-style life calendar that maps an optimistic lifespan of 4576 weeks and highlights the weeks already lived,
+          the current week, and the weeks still ahead.
+        </p>
+        <div class="links">
+          <a class="link" href="./mylifeinweeks/">Open project</a>
+          <a class="link secondary" href="https://github.com/qatastytest/vibecoding/tree/main/mylifeinweeks">View folder</a>
         </div>
-
-        <fieldset class="field-group">
-          <legend>Date of birth</legend>
-          <label class="field">
-            <span>Day</span>
-            <select id="birth-day" name="birth-day" aria-label="Birth day"></select>
-          </label>
-          <label class="field">
-            <span>Month</span>
-            <select id="birth-month" name="birth-month" aria-label="Birth month"></select>
-          </label>
-          <label class="field">
-            <span>Year</span>
-            <select id="birth-year" name="birth-year" aria-label="Birth year"></select>
-          </label>
-        </fieldset>
-
-        <div class="actions">
-          <button class="button secondary" type="button" id="jump-today">Back to today</button>
-          <button class="button" type="button" id="print-poster">Print poster</button>
-        </div>
-      </form>
-
-      <section class="summary-card" aria-label="Life statistics">
-        <div class="summary-main">
-          <p class="summary-kicker">Current position</p>
-          <div class="summary-age-line">
-            <strong id="current-age">0 years</strong>
-            <span id="year-of-life">Year 1 of 88</span>
-          </div>
-          <p class="summary-note" id="poster-note">0 weeks lived, 4576 remaining.</p>
-        </div>
-
-        <div class="summary-metrics">
-          <article class="metric">
-            <span class="stat-label">Weeks lived</span>
-            <strong id="weeks-lived">0</strong>
-          </article>
-          <article class="metric">
-            <span class="stat-label">Weeks remaining</span>
-            <strong id="weeks-left">4576</strong>
-          </article>
-          <article class="metric">
-            <span class="stat-label">Life used</span>
-            <strong id="life-percent">0%</strong>
-          </article>
-        </div>
-
-        <div class="progress-block" aria-hidden="true">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <section class="poster" aria-labelledby="poster-title">
-      <div class="poster-header">
-        <div>
-          <p class="poster-kicker">Weekly map</p>
-          <h2 id="poster-title">A poster-sized view of time</h2>
-        </div>
-        <div class="legend" aria-label="Legend">
-          <span><i class="legend-box legend-box-lived"></i>Lived</span>
-          <span><i class="legend-box legend-box-current"></i>Current week</span>
-          <span><i class="legend-box legend-box-future"></i>Remaining</span>
-        </div>
-      </div>
-      <p class="poster-helper" id="poster-helper">
-        Each row represents one year with 52 weeks, and the rows are numbered from 1 to 88.
-      </p>
-
-      <div class="grid-wrapper">
-        <aside class="year-labels" id="year-labels" aria-hidden="true"></aside>
-        <div class="weeks-grid" id="weeks-grid" aria-live="polite"></div>
-      </div>
+      </article>
     </section>
   </main>
-
-  <script src="script.js"></script>
 </body>
 </html>
