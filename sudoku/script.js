@@ -62,6 +62,11 @@ const state = {
   boardZoom: 1,
 };
 
+function syncBoardZoom() {
+  sudokuGrid.style.setProperty("--board-zoom", String(state.boardZoom));
+  updateZoomButtons();
+}
+
 function createEmptyGrid(fillValue = 0) {
   return Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(fillValue));
 }
@@ -248,44 +253,6 @@ function updateZoomButtons() {
   zoomInButton.disabled = state.boardZoom >= 1.05;
 }
 
-function updateBoardFitSize() {
-  if (!boardShell) {
-    return;
-  }
-
-  const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
-  const top = boardShell.getBoundingClientRect().top;
-  const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-  const containerWidth = boardShell.clientWidth;
-
-  let baseSize;
-  if (isMobileViewport) {
-    const isSmallPhone = viewportWidth <= 430;
-    const bottomPadding = isSmallPhone ? 68 : 44;
-    const horizontalSafety = isSmallPhone ? 28 : 18;
-    const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
-    const widthLimit = containerWidth - horizontalSafety;
-    const phoneCap = isSmallPhone ? 330 : Number.POSITIVE_INFINITY;
-    baseSize = Math.max(220, Math.min(widthLimit, availableHeight, phoneCap) - 4);
-  } else {
-    const desktopCap = Math.min(viewportWidth * 0.78, 560);
-    baseSize = Math.max(320, Math.min(containerWidth, desktopCap));
-  }
-
-  const fitSize = Math.max(220, Math.floor(baseSize * state.boardZoom));
-  sudokuGrid.style.width = `${fitSize}px`;
-  sudokuGrid.style.height = `${fitSize}px`;
-  updateZoomButtons();
-}
-
-function refreshBoardFitAfterLayoutChange() {
-  updateBoardFitSize();
-  window.requestAnimationFrame(() => {
-    updateBoardFitSize();
-  });
-}
-
 function startGame() {
   if (state.hasStarted) {
     return;
@@ -295,7 +262,6 @@ function startGame() {
   setBoardLocked(false);
   setBoardCompleted(false);
   updateMobilePlayingState();
-  refreshBoardFitAfterLayoutChange();
   startTimer();
   statusText.textContent = "Select an empty cell, then tap a number to place it.";
 }
@@ -449,8 +415,6 @@ function renderBoard() {
       renderBoard();
     }, 800);
   }
-
-  updateBoardFitSize();
 }
 
 function clearCell(row, column) {
@@ -557,7 +521,6 @@ function checkWinState() {
   stopTimer();
   setBoardCompleted(true);
   updateMobilePlayingState();
-  refreshBoardFitAfterLayoutChange();
   winTimeLabel.textContent = timerLabel.textContent;
 
   const elapsedSeconds = Math.floor((Date.now() - state.startTime) / 1000);
@@ -598,13 +561,13 @@ function createNewGame() {
   setBoardLocked(true);
   setBoardCompleted(false);
   updateMobilePlayingState();
-  refreshBoardFitAfterLayoutChange();
+  syncBoardZoom();
   renderBoard();
 }
 
 function adjustBoardZoom(delta) {
   state.boardZoom = Math.min(1.05, Math.max(0.8, Number((state.boardZoom + delta).toFixed(2))));
-  updateBoardFitSize();
+  syncBoardZoom();
 }
 
 function handleKeyInput(event) {
@@ -626,7 +589,7 @@ function init() {
   buildBoard();
   setDifficulty(state.difficulty);
   createNewGame();
-  updateBoardFitSize();
+  syncBoardZoom();
 }
 
 keypad.addEventListener("click", (event) => {
@@ -699,13 +662,12 @@ startGameButton.addEventListener("click", startGame);
 window.addEventListener("resize", () => {
   updateDifficultyLabel();
   updateMobilePlayingState();
-  updateBoardFitSize();
+  if (!window.matchMedia("(max-width: 720px)").matches && state.boardZoom < 1) {
+    state.boardZoom = 1;
+  }
+  syncBoardZoom();
 });
-window.addEventListener("orientationchange", updateBoardFitSize);
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", updateBoardFitSize);
-  window.visualViewport.addEventListener("scroll", updateBoardFitSize);
-}
+window.addEventListener("orientationchange", syncBoardZoom);
 window.addEventListener("keydown", handleKeyInput);
 
 init();
