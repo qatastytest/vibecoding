@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>SUDOKU</h1>
+      <p class="intro">Made for Sonia with love <span aria-hidden="true">&#9825;</span></p>
+    </section>
+
+    <section class="sudoku-app" aria-label="Sudoku game">
+      <div class="board-panel">
+        <div class="panel-header">
+          <div class="top-controls">
+            <div class="top-controls-copy">
+              <p class="panel-kicker">Game setup</p>
+              <h3>Choose difficulty</h3>
+            </div>
+            <div class="difficulty-list difficulty-list-top" id="difficulty-list" role="radiogroup" aria-label="Difficulty">
+              <button class="difficulty-button" type="button" data-difficulty="very-easy">
+                <span class="difficulty-level">1</span>
+                <span class="difficulty-name">
+                  <span class="difficulty-name-full">Very Easy</span>
+                  <span class="difficulty-name-short">V-Easy</span>
+                </span>
+              </button>
+              <button class="difficulty-button" type="button" data-difficulty="easy">
+                <span class="difficulty-level">2</span>
+                <span class="difficulty-name">
+                  <span class="difficulty-name-full">Easy</span>
+                  <span class="difficulty-name-short">Easy</span>
+                </span>
+              </button>
+              <button class="difficulty-button is-active" type="button" data-difficulty="medium">
+                <span class="difficulty-level">3</span>
+                <span class="difficulty-name">
+                  <span class="difficulty-name-full">Medium</span>
+                  <span class="difficulty-name-short">Medium</span>
+                </span>
+              </button>
+              <button class="difficulty-button" type="button" data-difficulty="advanced">
+                <span class="difficulty-level">4</span>
+                <span class="difficulty-name">
+                  <span class="difficulty-name-full">Advanced</span>
+                  <span class="difficulty-name-short">Adv.</span>
+                </span>
+              </button>
+              <button class="difficulty-button" type="button" data-difficulty="expert">
+                <span class="difficulty-level">5</span>
+                <span class="difficulty-name">
+                  <span class="difficulty-name-full">Expert</span>
+                  <span class="difficulty-name-short">Expert</span>
+                </span>
+              </button>
+            </div>
+          </div>
+          <button class="primary-button new-game-button" id="new-game-button" type="button">
+            <span class="button-glyph" aria-hidden="true">&#10227;</span>
+            <span>New Game</span>
+          </button>
+        </div>
+
+        <div class="stats-row" aria-live="polite">
+          <div class="stat-chip">
+            <span class="stat-label">Difficulty</span>
+            <strong id="difficulty-label">Medium</strong>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Time</span>
+            <strong id="timer-label">00:00</strong>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Hints</span>
+            <strong id="hints-label">3</strong>
+          </div>
+          <button class="secondary-button stat-action-button icon-button" id="undo-button" type="button" aria-label="Undo">
+            <span class="icon-glyph" aria-hidden="true">&#8630;</span>
+            <span class="icon-label">Undo</span>
+          </button>
+        </div>
+
+        <div class="board-shell">
+          <div class="sudoku-grid" id="sudoku-grid" role="grid" aria-label="Sudoku board"></div>
+          <div class="board-overlay" id="board-overlay">
+            <button class="primary-button start-game-button" id="start-game-button" type="button">Start Game</button>
+          </div>
+          <div class="board-overlay board-overlay-win" id="win-overlay" hidden>
+            <div class="win-card">
+              <p class="panel-kicker">Puzzle solved</p>
+              <h3>You did it!</h3>
+              <p class="win-time">Finished in <strong id="win-time-label">00:00</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="secondary-button quick-action-button icon-button" id="erase-button" type="button" aria-label="Erase">
+            <span class="icon-glyph" aria-hidden="true">&#9003;</span>
+            <span class="icon-label">Erase</span>
+          </button>
+          <button class="secondary-button quick-action-button icon-button" id="notes-button" type="button" aria-label="Toggle notes">
+            <span class="icon-glyph" aria-hidden="true">&#9998;</span>
+            <span class="icon-label" id="notes-button-label">Notes</span>
+          </button>
+          <button class="secondary-button quick-action-button icon-button" id="highlight-button" type="button" aria-label="Toggle highlight numbers">
+            <span class="icon-glyph" aria-hidden="true">&#9673;</span>
+            <span class="icon-label" id="highlight-button-label">Match</span>
+          </button>
+          <button class="secondary-button quick-action-button icon-button accent-button" id="hint-button" type="button" aria-label="Use hint">
+            <span class="icon-glyph" aria-hidden="true">?</span>
+            <span class="icon-label">Hint</span>
+          </button>
+        </div>
+        <p class="sr-only" id="status-text">Select an empty cell, then tap a number to place it.</p>
+
+        <div class="keypad" id="keypad" aria-label="Number keypad">
+          <button class="digit-button" type="button" data-digit="1">1</button>
+          <button class="digit-button" type="button" data-digit="2">2</button>
+          <button class="digit-button" type="button" data-digit="3">3</button>
+          <button class="digit-button" type="button" data-digit="4">4</button>
+          <button class="digit-button" type="button" data-digit="5">5</button>
+          <button class="digit-button" type="button" data-digit="6">6</button>
+          <button class="digit-button" type="button" data-digit="7">7</button>
+          <button class="digit-button" type="button" data-digit="8">8</button>
+          <button class="digit-button" type="button" data-digit="9">9</button>
+        </div>
+      </div>
+
+      <aside class="controls-panel">
+        <section class="card">
+          <p class="panel-kicker">Helper rules</p>
+          <h3>How to use the tools</h3>
+          <ul class="helper-list">
+            <li>Erase clears the selected cell.</li>
+            <li>Notes places small candidate numbers instead of a final answer.</li>
+            <li>Match highlights cells with the same number as the one you selected.</li>
+            <li>Hint reveals one random correct cell.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <p class="panel-kicker">Best times</p>
+          <h3>Saved on this device</h3>
+          <div class="best-times-list" id="best-times-list">
+            <div class="best-time-row">
+              <span>Very Easy</span>
+              <strong id="best-time-very-easy">--:--</strong>
+            </div>
+            <div class="best-time-row">
+              <span>Easy</span>
+              <strong id="best-time-easy">--:--</strong>
+            </div>
+            <div class="best-time-row">
+              <span>Medium</span>
+              <strong id="best-time-medium">--:--</strong>
+            </div>
+            <div class="best-time-row">
+              <span>Advanced</span>
+              <strong id="best-time-advanced">--:--</strong>
+            </div>
+            <div class="best-time-row">
+              <span>Expert</span>
+              <strong id="best-time-expert">--:--</strong>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
