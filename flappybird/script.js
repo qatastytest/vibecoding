@@ -51,8 +51,6 @@ const state = {
   scorePulse: 0,
   shakeTime: 0,
   shakeStrength: 0,
-  flashTime: 0,
-  flashColor: "#ffffff",
   muted: false,
   clouds: [
     { x: 70, y: 105, width: 90, speed: 10 },
@@ -215,8 +213,6 @@ function resetRun() {
   state.scorePulse = 0;
   state.shakeTime = 0;
   state.shakeStrength = 0;
-  state.flashTime = 0;
-  state.flashColor = "#ffffff";
   state.bird.x = BIRD_X;
   state.bird.y = GAME_HEIGHT * 0.42;
   state.bird.velocityY = 0;
@@ -238,8 +234,6 @@ function startRun() {
   state.scorePulse = 0;
   state.shakeTime = 0;
   state.shakeStrength = 0;
-  state.flashTime = 0;
-  state.flashColor = "#ffffff";
   state.bird.x = BIRD_X;
   state.bird.y = GAME_HEIGHT * 0.42;
   state.bird.velocityY = FLAP_VELOCITY;
@@ -269,7 +263,6 @@ function endRun() {
     saveBestScore(state.bestScore);
   }
   triggerScreenShake(0.42, 18);
-  triggerFlash("#ffffff", 0.12);
   spawnImpactParticles();
   playHitSound();
   playOverlay.classList.remove("play-overlay-visible");
@@ -366,11 +359,6 @@ function triggerScreenShake(duration, strength) {
   state.shakeStrength = strength;
 }
 
-function triggerFlash(color, duration) {
-  state.flashColor = color;
-  state.flashTime = duration;
-}
-
 function handleInput() {
   unlockAudio();
 
@@ -435,7 +423,6 @@ function updatePipes(deltaTime) {
       void scorePill.offsetWidth;
       scorePill.classList.add("pulse");
       window.setTimeout(() => scorePill.classList.remove("pulse"), 180);
-      triggerFlash("#ffe38a", 0.08);
       spawnScoreParticles(pipe);
       playScoreSound();
       if (state.score > state.bestScore) {
@@ -532,10 +519,6 @@ function updateFeedback(deltaTime) {
     if (state.shakeTime === 0) {
       state.shakeStrength = 0;
     }
-  }
-
-  if (state.flashTime > 0) {
-    state.flashTime = Math.max(0, state.flashTime - deltaTime);
   }
 
   updateParticles(deltaTime);
@@ -676,17 +659,6 @@ function drawParticles() {
   });
 }
 
-function drawFlashOverlay() {
-  if (state.flashTime <= 0) {
-    return;
-  }
-
-  context.globalAlpha = Math.min(state.flashTime * 4, 0.22);
-  context.fillStyle = state.flashColor;
-  context.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-  context.globalAlpha = 1;
-}
-
 function drawScoreInCanvas() {
   const pulse = state.scorePulse;
   const width = 104 + pulse * 10;
@@ -717,7 +689,6 @@ function drawFrame() {
   drawParticles();
   drawBird();
   drawScoreInCanvas();
-  drawFlashOverlay();
   context.restore();
 }
 
