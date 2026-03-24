@@ -16,6 +16,10 @@ const FLAP_VELOCITY = -420;
 const MAX_DROP_SPEED = 640;
 const BIRD_RADIUS = 18;
 const BIRD_X = 140;
+const ENEMY_RADIUS = 16;
+const ENEMY_SPAWN_SCORE_THRESHOLD = 12;
+const BASE_ENEMY_SPAWN_INTERVAL = 3.9;
+const MIN_ENEMY_SPAWN_INTERVAL = 2.1;
 
 const canvas = document.querySelector("#game-canvas");
 const canvasFrame = document.querySelector(".canvas-frame");
@@ -39,6 +43,7 @@ const state = {
   bestScore: 0,
   elapsed: 0,
   spawnTimer: 0,
+  enemySpawnTimer: 0,
   bird: {
     x: BIRD_X,
     y: GAME_HEIGHT * 0.42,
@@ -47,6 +52,7 @@ const state = {
     wingPhase: 0,
   },
   pipes: [],
+  enemies: [],
   particles: [],
   scorePulse: 0,
   shakeTime: 0,
@@ -208,7 +214,9 @@ function resetRun() {
   state.score = 0;
   state.elapsed = 0;
   state.spawnTimer = 0;
+  state.enemySpawnTimer = 0;
   state.pipes = [];
+  state.enemies = [];
   state.particles = [];
   state.scorePulse = 0;
   state.shakeTime = 0;
@@ -229,7 +237,9 @@ function startRun() {
   state.score = 0;
   state.elapsed = 0;
   state.spawnTimer = 0;
+  state.enemySpawnTimer = 0;
   state.pipes = [];
+  state.enemies = [];
   state.particles = [];
   state.scorePulse = 0;
   state.shakeTime = 0;
@@ -297,6 +307,11 @@ function getCurrentSpawnInterval() {
   return BASE_PIPE_SPAWN_INTERVAL - ((BASE_PIPE_SPAWN_INTERVAL - MIN_PIPE_SPAWN_INTERVAL) * progress);
 }
 
+function getCurrentEnemySpawnInterval() {
+  const progress = getDifficultyProgress();
+  return BASE_ENEMY_SPAWN_INTERVAL - ((BASE_ENEMY_SPAWN_INTERVAL - MIN_ENEMY_SPAWN_INTERVAL) * progress);
+}
+
 function addPipePair() {
   const currentGap = getCurrentPipeGap();
   state.pipes.push({
@@ -304,6 +319,27 @@ function addPipePair() {
     gapY: randomPipeGapY(),
     gap: currentGap,
     scored: false,
+  });
+}
+
+function addEnemyBird() {
+  const laneMin = 120;
+  const laneMax = GAME_HEIGHT - GROUND_HEIGHT - 160;
+  const baseY = laneMin + Math.random() * (laneMax - laneMin);
+  const amplitude = 18 + Math.random() * 24;
+  const verticalSpeed = 2.2 + Math.random() * 1.3;
+  const driftSpeed = 195 + Math.random() * 45 + (getDifficultyProgress() * 35);
+
+  state.enemies.push({
+    x: GAME_WIDTH + 80,
+    y: baseY,
+    baseY,
+    amplitude,
+    verticalSpeed,
+    driftSpeed,
+    flapPhase: Math.random() * Math.PI * 2,
+    bobOffset: Math.random() * Math.PI * 2,
+    radius: ENEMY_RADIUS,
   });
 }
 
@@ -435,6 +471,39 @@ function updatePipes(deltaTime) {
   state.pipes = state.pipes.filter((pipe) => pipe.x + PIPE_WIDTH > -40);
 }
 
+function updateEnemies(deltaTime) {
+  if (state.score < ENEMY_SPAWN_SCORE_THRESHOLD) {
+    state.enemySpawnTimer = 0;
+    state.enemies = [];
+    return;
+  }
+
+  state.enemySpawnTimer += deltaTime;
+  const spawnInterval = getCurrentEnemySpawnInterval();
+
+  if (state.enemySpawnTimer >= spawnInterval) {
+    state.enemySpawnTimer = 0;
+    addEnemyBird();
+  }
+
+  state.enemies.forEach((enemy) => {
+    enemy.x -= enemy.driftSpeed * deltaTime;
+    enemy.bobOffset += enemy.verticalSpeed * deltaTime;
+    enemy.flapPhase += deltaTime * 13;
+    enemy.y = enemy.baseY + Math.sin(enemy.bobOffset) * enemy.amplitude;
+  });
+
+  state.enemies = state.enemies.filter((enemy) => enemy.x + enemy.radius * 2 > -30);
+}
+
+function circlesOverlap(aX, aY, aRadius, bX, bY, bRadius) {
+  const deltaX = aX - bX;
+  const deltaY = aY - bY;
+  const distanceSquared = (deltaX * deltaX) + (deltaY * deltaY);
+  const radii = aRadius + bRadius;
+  return distanceSquared <= radii * radii;
+}
+
 function circleRectCollision(circleX, circleY, radius, rectX, rectY, rectWidth, rectHeight) {
   const closestX = Math.max(rectX, Math.min(circleX, rectX + rectWidth));
   const closestY = Math.max(rectY, Math.min(circleY, rectY + rectHeight));
@@ -478,6 +547,13 @@ function checkCollisions() {
     );
 
     if (hitTopPipe || hitBottomPipe) {
+      endRun();
+      return;
+    }
+  }
+
+  for (const enemy of state.enemies) {
+    if (circlesOverlap(state.bird.x, state.bird.y, BIRD_RADIUS, enemy.x, enemy.y, enemy.radius)) {
       endRun();
       return;
     }
@@ -536,6 +612,7 @@ function updateGame(deltaTime) {
   state.elapsed += deltaTime;
   updateBird(deltaTime);
   updatePipes(deltaTime);
+  updateEnemies(deltaTime);
   checkCollisions();
 }
 
@@ -647,6 +724,54 @@ function drawBird() {
   context.restore();
 }
 
+function drawEnemyBird(enemy) {
+  context.save();
+  context.translate(enemy.x, enemy.y);
+  context.scale(-1, 1);
+
+  context.fillStyle = "#ff8b5f";
+  context.beginPath();
+  context.ellipse(0, 0, 19, 14, 0, 0, Math.PI * 2);
+  context.fill();
+
+  const wingOffset = Math.sin(enemy.flapPhase) * 5;
+  context.fillStyle = "#ff6b43";
+  context.beginPath();
+  context.ellipse(-3, 2 + wingOffset * 0.25, 10, 6.5, -0.45, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#ffd4c6";
+  context.beginPath();
+  context.ellipse(6, 1, 7, 6, 0.2, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#fff";
+  context.beginPath();
+  context.arc(5, -4, 4.6, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#111";
+  context.beginPath();
+  context.arc(6.5, -4, 2, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#f6b84a";
+  context.beginPath();
+  context.moveTo(-16, -1);
+  context.lineTo(-29, -4);
+  context.lineTo(-16, 6);
+  context.closePath();
+  context.fill();
+
+  context.restore();
+}
+
+function drawEnemies() {
+  state.enemies.forEach((enemy) => {
+    drawEnemyBird(enemy);
+  });
+}
+
 function drawParticles() {
   state.particles.forEach((particle) => {
     const alpha = particle.life / particle.maxLife;
@@ -685,6 +810,7 @@ function drawFrame() {
   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   drawBackground();
   drawPipes();
+  drawEnemies();
   drawGround();
   drawParticles();
   drawBird();
