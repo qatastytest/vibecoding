@@ -665,8 +665,8 @@ undoButton.addEventListener("click", () => {
 });
 
 hintButton.addEventListener("click", useHint);
-zoomOutButton.addEventListener("click", () => adjustBoardZoom(-0.05));
-zoomInButton.addEventListener("click", () => adjustBoardZoom(0.05));
+zoomOutButton.addEventListener("click", () => adjustBoardZoom(0.05));
+zoomInButton.addEventListener("click", () => adjustBoardZoom(-0.05));
 startGameButton.addEventListener("click", startGame);
 window.addEventListener("resize", () => {
   updateDifficultyLabel();
