@@ -168,9 +168,8 @@ function updateLifeView() {
 }
 
 function setDefaultBirthdate() {
-  const defaultDate = new Date();
-  defaultDate.setFullYear(defaultDate.getFullYear() - 30);
-  applyBirthdate(defaultDate);
+  const today = new Date();
+  applyBirthdate(today);
 }
 
 function applyBirthdate(date) {
