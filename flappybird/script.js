@@ -6,9 +6,9 @@ const GROUND_HEIGHT = 112;
 const CEILING_HEIGHT = 8;
 const PIPE_WIDTH = 84;
 const BASE_PIPE_GAP = 176;
-const MIN_PIPE_GAP = 136;
+const MIN_PIPE_GAP = 146;
 const BASE_PIPE_SPEED = 170;
-const MAX_PIPE_SPEED = 240;
+const MAX_PIPE_SPEED = 225;
 const BASE_PIPE_SPAWN_INTERVAL = 1.45;
 const MIN_PIPE_SPAWN_INTERVAL = 1.08;
 const GRAVITY = 1450;
@@ -18,8 +18,9 @@ const BIRD_RADIUS = 18;
 const BIRD_X = 140;
 const ENEMY_RADIUS = 16;
 const ENEMY_SPAWN_SCORE_THRESHOLD = 12;
-const BASE_ENEMY_SPAWN_INTERVAL = 3.9;
-const MIN_ENEMY_SPAWN_INTERVAL = 2.1;
+const BASE_ENEMY_SPAWN_INTERVAL = 5.2;
+const MIN_ENEMY_SPAWN_INTERVAL = 3.1;
+const ENEMY_WARNING_TIME = 0.9;
 
 const canvas = document.querySelector("#game-canvas");
 const canvasFrame = document.querySelector(".canvas-frame");
@@ -326,12 +327,12 @@ function addEnemyBird() {
   const laneMin = 120;
   const laneMax = GAME_HEIGHT - GROUND_HEIGHT - 160;
   const baseY = laneMin + Math.random() * (laneMax - laneMin);
-  const amplitude = 18 + Math.random() * 24;
-  const verticalSpeed = 2.2 + Math.random() * 1.3;
-  const driftSpeed = 195 + Math.random() * 45 + (getDifficultyProgress() * 35);
+  const amplitude = 12 + Math.random() * 16;
+  const verticalSpeed = 1.4 + Math.random() * 0.9;
+  const driftSpeed = 172 + Math.random() * 26 + (getDifficultyProgress() * 24);
 
   state.enemies.push({
-    x: GAME_WIDTH + 80,
+    x: GAME_WIDTH + 120,
     y: baseY,
     baseY,
     amplitude,
@@ -340,6 +341,7 @@ function addEnemyBird() {
     flapPhase: Math.random() * Math.PI * 2,
     bobOffset: Math.random() * Math.PI * 2,
     radius: ENEMY_RADIUS,
+    warningTime: ENEMY_WARNING_TIME,
   });
 }
 
@@ -487,13 +489,19 @@ function updateEnemies(deltaTime) {
   }
 
   state.enemies.forEach((enemy) => {
+    enemy.flapPhase += deltaTime * 11;
+
+    if (enemy.warningTime > 0) {
+      enemy.warningTime = Math.max(0, enemy.warningTime - deltaTime);
+      return;
+    }
+
     enemy.x -= enemy.driftSpeed * deltaTime;
     enemy.bobOffset += enemy.verticalSpeed * deltaTime;
-    enemy.flapPhase += deltaTime * 13;
     enemy.y = enemy.baseY + Math.sin(enemy.bobOffset) * enemy.amplitude;
   });
 
-  state.enemies = state.enemies.filter((enemy) => enemy.x + enemy.radius * 2 > -30);
+  state.enemies = state.enemies.filter((enemy) => enemy.warningTime > 0 || enemy.x + enemy.radius * 2 > -30);
 }
 
 function circlesOverlap(aX, aY, aRadius, bX, bY, bRadius) {
@@ -553,6 +561,10 @@ function checkCollisions() {
   }
 
   for (const enemy of state.enemies) {
+    if (enemy.warningTime > 0) {
+      continue;
+    }
+
     if (circlesOverlap(state.bird.x, state.bird.y, BIRD_RADIUS, enemy.x, enemy.y, enemy.radius)) {
       endRun();
       return;
@@ -725,6 +737,11 @@ function drawBird() {
 }
 
 function drawEnemyBird(enemy) {
+  if (enemy.warningTime > 0) {
+    drawEnemyWarning(enemy);
+    return;
+  }
+
   context.save();
   context.translate(enemy.x, enemy.y);
   context.scale(-1, 1);
@@ -763,6 +780,28 @@ function drawEnemyBird(enemy) {
   context.closePath();
   context.fill();
 
+  context.restore();
+}
+
+function drawEnemyWarning(enemy) {
+  const alpha = 0.35 + ((Math.sin(enemy.warningTime * 18) + 1) * 0.2);
+  const markerX = GAME_WIDTH - 22;
+  const markerY = enemy.baseY;
+
+  context.save();
+  context.globalAlpha = alpha;
+  context.fillStyle = "#ff7d57";
+  context.beginPath();
+  context.moveTo(markerX, markerY);
+  context.lineTo(markerX - 18, markerY - 12);
+  context.lineTo(markerX - 18, markerY + 12);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = "#fff6ef";
+  context.font = "700 14px Segoe UI";
+  context.textAlign = "center";
+  context.fillText("!", markerX - 10, markerY + 5);
   context.restore();
 }
 
