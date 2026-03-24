@@ -6,12 +6,13 @@
   <title>Vibecoding Projects</title>
   <style>
     :root {
-      --bg: #f4efe7;
-      --panel: #fffaf2;
-      --ink: #181511;
-      --muted: #6c645b;
-      --accent: #a56f2c;
-      --line: rgba(24, 21, 17, 0.08);
+      --bg: #f3eee5;
+      --panel: rgba(255, 250, 242, 0.9);
+      --panel-strong: #fffaf2;
+      --ink: #17130f;
+      --muted: #6a6259;
+      --accent: #ab7430;
+      --line: rgba(23, 19, 15, 0.08);
       --shadow: 0 28px 72px rgba(50, 37, 20, 0.12);
     }
 
@@ -25,94 +26,309 @@
       font-family: "Segoe UI", Arial, sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(165, 111, 44, 0.14), transparent 24%),
+        radial-gradient(circle at top left, rgba(171, 116, 48, 0.15), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(171, 116, 48, 0.08), transparent 18%),
         linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.32)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(23, 19, 15, 0.02) 0,
+          rgba(23, 19, 15, 0.02) 1px,
+          transparent 1px,
+          transparent 14px
+        );
+    }
+
     .page {
-      width: min(1100px, calc(100vw - 32px));
+      width: min(1180px, calc(100vw - 32px));
       margin: 0 auto;
-      padding: 56px 0 80px;
+      padding: 56px 0 84px;
+      position: relative;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 34px;
     }
 
-    .eyebrow {
-      margin: 0 0 14px;
-      color: var(--accent);
+    .eyebrow,
+    .section-label,
+    .status {
+      margin: 0;
       text-transform: uppercase;
-      letter-spacing: 0.22em;
-      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      font-size: 0.74rem;
+      color: var(--accent);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 600;
+      letter-spacing: 0.05em;
     }
 
     h1 {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(2.8rem, 8vw, 5rem);
-      letter-spacing: 0.08em;
+      font-size: clamp(2.9rem, 8vw, 5.4rem);
       line-height: 0.95;
     }
 
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+    }
+
+    h3 {
+      font-size: 1.8rem;
+    }
+
     .intro {
-      width: min(720px, 100%);
+      width: min(760px, 100%);
       margin: 18px auto 0;
       color: var(--muted);
-      line-height: 1.8;
+      line-height: 1.85;
+      font-size: 1.02rem;
     }
 
-    .projects {
-      display: grid;
-      gap: 18px;
-    }
-
-    .project-card {
-      display: grid;
-      gap: 12px;
-      background: rgba(255, 250, 242, 0.94);
+    .featured,
+    .project-card,
+    .roadmap {
+      background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 28px;
-      padding: 26px;
       box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
 
-    .project-card h2 {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 2rem;
-      letter-spacing: 0.04em;
+    .featured {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      padding: 28px;
+      border-radius: 32px;
+      margin-bottom: 22px;
+      overflow: hidden;
     }
 
-    .project-card p {
+    .featured-copy {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .featured-copy p,
+    .project-card p,
+    .roadmap p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
-    .links {
+    .pill-row {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 8px;
     }
 
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      background: rgba(23, 19, 15, 0.05);
+      color: var(--ink);
+    }
+
+    .featured-art {
+      min-height: 280px;
+      border-radius: 24px;
+      padding: 20px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.18)),
+        var(--panel-strong);
+      display: grid;
+      align-items: center;
+    }
+
+    .mini-poster {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .mini-years {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 0.65rem;
+      text-align: right;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(26, 8px);
+      gap: 4px;
+      width: max-content;
+    }
+
+    .mini-cell {
+      width: 8px;
+      height: 8px;
+      border-radius: 1px;
+      border: 1px solid rgba(23, 19, 15, 0.14);
+      background: rgba(23, 19, 15, 0.05);
+    }
+
+    .mini-cell.filled {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .mini-cell.current {
+      background: rgba(171, 116, 48, 0.22);
+      border-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
     .link {
       display: inline-flex;
       align-items: center;
-      padding: 12px 16px;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 18px;
       border-radius: 999px;
       text-decoration: none;
       border: 1px solid var(--ink);
-      color: #fffaf2;
       background: var(--ink);
+      color: #fffaf2;
+      transition: transform 160ms ease, opacity 160ms ease;
     }
 
     .link.secondary {
       background: transparent;
       color: var(--ink);
-      border-color: rgba(24, 21, 17, 0.16);
+      border-color: rgba(23, 19, 15, 0.14);
+    }
+
+    .link:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 26px 0 14px;
+    }
+
+    .section-note {
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .project-card {
+      border-radius: 28px;
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .status {
+      color: var(--muted);
+    }
+
+    .project-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .project-meta span {
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      background: rgba(23, 19, 15, 0.05);
+      color: var(--muted);
+    }
+
+    .roadmap {
+      margin-top: 22px;
+      border-radius: 28px;
+      padding: 24px;
+    }
+
+    .roadmap-list {
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .roadmap-list li {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(23, 19, 15, 0.04);
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .featured,
+      .projects,
+      .roadmap-list {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100vw - 20px, 100%);
+        padding: 28px 0 44px;
+      }
+
+      .featured,
+      .project-card,
+      .roadmap {
+        border-radius: 22px;
+        padding: 20px;
+      }
+
+      .mini-grid {
+        grid-template-columns: repeat(18, 8px);
+      }
     }
   </style>
 </head>
@@ -122,23 +338,109 @@
       <p class="eyebrow">Vibecoding</p>
       <h1>SMALL PROJECTS, HOSTED SEPARATELY</h1>
       <p class="intro">
-        This repository is now a home for small experiments and tools. Each project lives in its own folder and is available
-        on GitHub Pages under its own path.
+        This repository is a home for small experiments, useful tools, and visual ideas. Each project lives in its own folder
+        and is published on GitHub Pages under its own path, so the collection can grow without becoming messy.
+      </p>
+    </section>
+
+    <section class="featured">
+      <div class="featured-copy">
+        <p class="section-label">Featured project</p>
+        <h2>My Life in Weeks</h2>
+        <p>
+          A poster-style life calendar that maps an optimistic lifespan of 4576 weeks and highlights what has already been
+          lived, what week you are currently in, and what still remains.
+        </p>
+        <div class="pill-row">
+          <span class="pill">Poster layout</span>
+          <span class="pill">Print-friendly</span>
+          <span class="pill">Client-side only</span>
+        </div>
+        <div class="actions">
+          <a class="link" href="./mylifeinweeks/">Open project</a>
+          <a class="link secondary" href="https://github.com/qatastytest/vibecoding/tree/main/mylifeinweeks">View source</a>
+        </div>
+      </div>
+
+      <div class="featured-art" aria-hidden="true">
+        <div class="mini-poster">
+          <div class="mini-years">
+            <span>1</span>
+            <span>8</span>
+            <span>16</span>
+            <span>24</span>
+            <span>32</span>
+            <span>40</span>
+          </div>
+          <div class="mini-grid">
+            <span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span>
+            <span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span>
+            <span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell filled"></span><span class="mini-cell current"></span><span class="mini-cell"></span><span class="mini-cell"></span>
+            <span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span>
+            <span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span>
+            <span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span><span class="mini-cell"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-header">
+      <div>
+        <p class="section-label">Project shelf</p>
+        <h2>Current and upcoming experiments</h2>
+      </div>
+      <p class="section-note">
+        Each card here maps to its own GitHub Pages path, so the repo stays organized as more ideas are added.
       </p>
     </section>
 
     <section class="projects">
       <article class="project-card">
-        <h2>My Life in Weeks</h2>
-        <p>
-          A poster-style life calendar that maps an optimistic lifespan of 4576 weeks and highlights the weeks already lived,
-          the current week, and the weeks still ahead.
-        </p>
-        <div class="links">
-          <a class="link" href="./mylifeinweeks/">Open project</a>
-          <a class="link secondary" href="https://github.com/qatastytest/vibecoding/tree/main/mylifeinweeks">View folder</a>
+        <p class="status">Live now</p>
+        <h3>My Life in Weeks</h3>
+        <p>A visual life calendar with a poster aesthetic, quick date selection, and print mode.</p>
+        <div class="project-meta">
+          <span>/mylifeinweeks/</span>
+          <span>Static app</span>
+        </div>
+        <div class="actions">
+          <a class="link" href="./mylifeinweeks/">Open</a>
         </div>
       </article>
+
+      <article class="project-card">
+        <p class="status">Coming soon</p>
+        <h3>Countdown Board</h3>
+        <p>A small visual countdown app for milestones, launches, and personal deadlines.</p>
+        <div class="project-meta">
+          <span>/countdownboard/</span>
+          <span>Placeholder</span>
+        </div>
+      </article>
+
+      <article class="project-card">
+        <p class="status">Coming soon</p>
+        <h3>Habit Tiles</h3>
+        <p>A compact tracker for streaks and routines, built around a simple tile-based interface.</p>
+        <div class="project-meta">
+          <span>/habittiles/</span>
+          <span>Placeholder</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="roadmap">
+      <p class="section-label">How this repo works</p>
+      <h2>Simple structure, separate paths</h2>
+      <p>
+        The root page acts as a directory. Each project lives in its own folder with its own `index.html`, which means every
+        mini-app can be visited directly without needing a separate repository.
+      </p>
+      <ul class="roadmap-list">
+        <li>`/` is the landing page for the collection.</li>
+        <li>`/mylifeinweeks/` is the first published mini-project.</li>
+        <li>New folders can be added later without changing the overall setup.</li>
+      </ul>
     </section>
   </main>
 </body>
