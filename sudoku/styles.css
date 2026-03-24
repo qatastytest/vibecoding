@@ -309,6 +309,31 @@ h3 {
   display: none;
 }
 
+.board-utility-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+  margin-bottom: -6px;
+}
+
+.board-zoom-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.zoom-button {
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 252, 246, 0.88);
+  border: 1px solid rgba(95, 108, 61, 0.14);
+  box-shadow: 0 10px 18px rgba(86, 99, 57, 0.12);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
 .start-game-button {
   min-width: 164px;
   min-height: 52px;
@@ -700,6 +725,22 @@ h3 {
   .board-shell {
     width: 100%;
     margin: 10px auto 10px;
+  }
+
+  .board-utility-row {
+    margin-top: 10px;
+    margin-bottom: -2px;
+  }
+
+  .board-zoom-controls {
+    gap: 6px;
+  }
+
+  .zoom-button {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 1rem;
   }
 
   .panel-header,

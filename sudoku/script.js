@@ -27,6 +27,8 @@ const highlightButton = document.querySelector("#highlight-button");
 const highlightButtonLabel = document.querySelector("#highlight-button-label");
 const undoButton = document.querySelector("#undo-button");
 const hintButton = document.querySelector("#hint-button");
+const zoomOutButton = document.querySelector("#zoom-out-button");
+const zoomInButton = document.querySelector("#zoom-in-button");
 const difficultyLabel = document.querySelector("#difficulty-label");
 const timerLabel = document.querySelector("#timer-label");
 const hintsLabel = document.querySelector("#hints-label");
@@ -57,6 +59,7 @@ const state = {
   lastHintedCell: null,
   hasStarted: false,
   bestTimes: {},
+  boardZoom: 1,
 };
 
 function createEmptyGrid(fillValue = 0) {
@@ -240,31 +243,40 @@ function updateMobilePlayingState() {
   document.body.classList.toggle("is-playing-mobile", isMobileViewport && state.hasStarted && winOverlay.hidden);
 }
 
+function updateZoomButtons() {
+  zoomOutButton.disabled = state.boardZoom <= 0.8;
+  zoomInButton.disabled = state.boardZoom >= 1.05;
+}
+
 function updateBoardFitSize() {
   if (!boardShell) {
     return;
   }
 
   const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
-  if (!isMobileViewport) {
-    sudokuGrid.style.removeProperty("width");
-    sudokuGrid.style.removeProperty("height");
-    return;
-  }
-
   const top = boardShell.getBoundingClientRect().top;
   const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
   const containerWidth = boardShell.clientWidth;
-  const isSmallPhone = viewportWidth <= 430;
-  const bottomPadding = isSmallPhone ? 68 : 44;
-  const horizontalSafety = isSmallPhone ? 28 : 18;
-  const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
-  const widthLimit = containerWidth - horizontalSafety;
-  const phoneCap = isSmallPhone ? 330 : Number.POSITIVE_INFINITY;
-  const fitSize = Math.max(220, Math.min(widthLimit, availableHeight, phoneCap) - 4);
+
+  let baseSize;
+  if (isMobileViewport) {
+    const isSmallPhone = viewportWidth <= 430;
+    const bottomPadding = isSmallPhone ? 68 : 44;
+    const horizontalSafety = isSmallPhone ? 28 : 18;
+    const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
+    const widthLimit = containerWidth - horizontalSafety;
+    const phoneCap = isSmallPhone ? 330 : Number.POSITIVE_INFINITY;
+    baseSize = Math.max(220, Math.min(widthLimit, availableHeight, phoneCap) - 4);
+  } else {
+    const desktopCap = Math.min(viewportWidth * 0.78, 560);
+    baseSize = Math.max(320, Math.min(containerWidth, desktopCap));
+  }
+
+  const fitSize = Math.max(220, Math.floor(baseSize * state.boardZoom));
   sudokuGrid.style.width = `${fitSize}px`;
   sudokuGrid.style.height = `${fitSize}px`;
+  updateZoomButtons();
 }
 
 function refreshBoardFitAfterLayoutChange() {
@@ -570,6 +582,7 @@ function createNewGame() {
   state.noteMode = false;
   state.lastHintedCell = null;
   state.hasStarted = false;
+  state.boardZoom = window.matchMedia("(max-width: 720px)").matches ? 0.92 : 1;
   resetNotes();
   stopTimer();
   timerLabel.textContent = "00:00";
@@ -587,6 +600,11 @@ function createNewGame() {
   updateMobilePlayingState();
   refreshBoardFitAfterLayoutChange();
   renderBoard();
+}
+
+function adjustBoardZoom(delta) {
+  state.boardZoom = Math.min(1.05, Math.max(0.8, Number((state.boardZoom + delta).toFixed(2))));
+  updateBoardFitSize();
 }
 
 function handleKeyInput(event) {
@@ -675,6 +693,8 @@ undoButton.addEventListener("click", () => {
 });
 
 hintButton.addEventListener("click", useHint);
+zoomOutButton.addEventListener("click", () => adjustBoardZoom(-0.05));
+zoomInButton.addEventListener("click", () => adjustBoardZoom(0.05));
 startGameButton.addEventListener("click", startGame);
 window.addEventListener("resize", () => {
   updateDifficultyLabel();
