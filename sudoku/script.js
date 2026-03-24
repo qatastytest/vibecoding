@@ -254,11 +254,15 @@ function updateBoardFitSize() {
 
   const top = boardShell.getBoundingClientRect().top;
   const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
   const containerWidth = boardShell.clientWidth;
-  const bottomPadding = 44;
-  const horizontalSafety = 18;
+  const isSmallPhone = viewportWidth <= 430;
+  const bottomPadding = isSmallPhone ? 68 : 44;
+  const horizontalSafety = isSmallPhone ? 28 : 18;
   const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
-  const fitSize = Math.max(220, Math.min(containerWidth - horizontalSafety, availableHeight) - 4);
+  const widthLimit = containerWidth - horizontalSafety;
+  const phoneCap = isSmallPhone ? 330 : Number.POSITIVE_INFINITY;
+  const fitSize = Math.max(220, Math.min(widthLimit, availableHeight, phoneCap) - 4);
   sudokuGrid.style.width = `${fitSize}px`;
   sudokuGrid.style.height = `${fitSize}px`;
 }
