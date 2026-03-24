@@ -354,7 +354,7 @@ h3 {
 }
 
 .sudoku-grid {
-  width: min(100%, var(--grid-size), var(--board-fit-size, 999px));
+  width: min(100%, var(--grid-size));
   max-width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;

@@ -242,15 +242,19 @@ function updateBoardFitSize() {
 
   const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
   if (!isMobileViewport) {
-    document.documentElement.style.removeProperty("--board-fit-size");
+    sudokuGrid.style.removeProperty("width");
+    sudokuGrid.style.removeProperty("height");
     return;
   }
 
   const top = boardShell.getBoundingClientRect().top;
   const viewportHeight = window.innerHeight;
-  const bottomPadding = 10;
+  const containerWidth = boardShell.clientWidth;
+  const bottomPadding = 8;
   const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
-  document.documentElement.style.setProperty("--board-fit-size", `${availableHeight}px`);
+  const fitSize = Math.max(220, Math.min(containerWidth, availableHeight));
+  sudokuGrid.style.width = `${fitSize}px`;
+  sudokuGrid.style.height = `${fitSize}px`;
 }
 
 function startGame() {
