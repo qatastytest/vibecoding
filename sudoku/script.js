@@ -235,6 +235,11 @@ function setBoardCompleted(completed) {
   winOverlay.hidden = !completed;
 }
 
+function updateMobilePlayingState() {
+  const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
+  document.body.classList.toggle("is-playing-mobile", isMobileViewport && state.hasStarted && winOverlay.hidden);
+}
+
 function updateBoardFitSize() {
   if (!boardShell) {
     return;
@@ -265,6 +270,7 @@ function startGame() {
   state.hasStarted = true;
   setBoardLocked(false);
   setBoardCompleted(false);
+  updateMobilePlayingState();
   startTimer();
   statusText.textContent = "Select an empty cell, then tap a number to place it.";
 }
@@ -525,6 +531,7 @@ function checkWinState() {
   statusText.textContent = "Puzzle solved. Nice work.";
   stopTimer();
   setBoardCompleted(true);
+  updateMobilePlayingState();
   winTimeLabel.textContent = timerLabel.textContent;
 
   const elapsedSeconds = Math.floor((Date.now() - state.startTime) / 1000);
@@ -563,6 +570,7 @@ function createNewGame() {
   statusText.textContent = "Tap Start Game when you're ready.";
   setBoardLocked(true);
   setBoardCompleted(false);
+  updateMobilePlayingState();
   renderBoard();
 }
 
@@ -655,6 +663,7 @@ hintButton.addEventListener("click", useHint);
 startGameButton.addEventListener("click", startGame);
 window.addEventListener("resize", () => {
   updateDifficultyLabel();
+  updateMobilePlayingState();
   updateBoardFitSize();
 });
 window.addEventListener("orientationchange", updateBoardFitSize);
