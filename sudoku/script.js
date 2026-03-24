@@ -11,6 +11,7 @@ const DIFFICULTY_CONFIG = {
 };
 
 const sudokuGrid = document.querySelector("#sudoku-grid");
+const boardShell = document.querySelector(".board-shell");
 const boardOverlay = document.querySelector("#board-overlay");
 const winOverlay = document.querySelector("#win-overlay");
 const winTimeLabel = document.querySelector("#win-time-label");
@@ -234,6 +235,24 @@ function setBoardCompleted(completed) {
   winOverlay.hidden = !completed;
 }
 
+function updateBoardFitSize() {
+  if (!boardShell) {
+    return;
+  }
+
+  const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
+  if (!isMobileViewport) {
+    document.documentElement.style.removeProperty("--board-fit-size");
+    return;
+  }
+
+  const top = boardShell.getBoundingClientRect().top;
+  const viewportHeight = window.innerHeight;
+  const bottomPadding = 10;
+  const availableHeight = Math.max(220, Math.floor(viewportHeight - top - bottomPadding));
+  document.documentElement.style.setProperty("--board-fit-size", `${availableHeight}px`);
+}
+
 function startGame() {
   if (state.hasStarted) {
     return;
@@ -395,6 +414,8 @@ function renderBoard() {
       renderBoard();
     }, 800);
   }
+
+  updateBoardFitSize();
 }
 
 function clearCell(row, column) {
@@ -560,6 +581,7 @@ function init() {
   buildBoard();
   setDifficulty(state.difficulty);
   createNewGame();
+  updateBoardFitSize();
 }
 
 keypad.addEventListener("click", (event) => {
@@ -627,7 +649,11 @@ undoButton.addEventListener("click", () => {
 
 hintButton.addEventListener("click", useHint);
 startGameButton.addEventListener("click", startGame);
-window.addEventListener("resize", updateDifficultyLabel);
+window.addEventListener("resize", () => {
+  updateDifficultyLabel();
+  updateBoardFitSize();
+});
+window.addEventListener("orientationchange", updateBoardFitSize);
 window.addEventListener("keydown", handleKeyInput);
 
 init();

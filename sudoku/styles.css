@@ -354,7 +354,7 @@ h3 {
 }
 
 .sudoku-grid {
-  width: min(100%, var(--grid-size));
+  width: min(100%, var(--grid-size), var(--board-fit-size, 999px));
   max-width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
@@ -682,7 +682,7 @@ h3 {
 
 @media (max-width: 720px) {
   :root {
-    --grid-size: min(calc(100vw - 18px), max(260px, calc(100dvh - 470px)));
+    --grid-size: calc(100vw - 18px);
   }
 
   .page {
@@ -866,7 +866,7 @@ h3 {
 
 @media (max-width: 430px) and (min-height: 780px) {
   :root {
-    --grid-size: min(calc(100vw - 16px), max(254px, calc(100dvh - 465px)));
+    --grid-size: calc(100vw - 16px);
   }
 
   .top-controls-copy h3 {
