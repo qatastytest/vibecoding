@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Life in Weeks</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <p class="eyebrow">A life visualized, one week at a time</p>
+      <h1>MY LIFE IN WEEKS</h1>
+      <p class="intro">
+        The average optimistic life span is about <strong>4576 weeks</strong>.
+        Pick a birth date and see how many have already been lived and how many still remain.
+      </p>
+    </section>
+
+    <section class="controls-card" aria-labelledby="birth-date-heading">
+      <div class="controls-copy">
+        <h2 id="birth-date-heading">Choose a birth date</h2>
+        <p>The grid updates instantly and marks each lived week as a filled square.</p>
+      </div>
+
+      <form class="controls" id="life-form">
+        <fieldset class="field-group">
+          <legend>Date of birth</legend>
+          <label class="field">
+            <span>Day</span>
+            <select id="birth-day" name="birth-day" aria-label="Birth day"></select>
+          </label>
+          <label class="field">
+            <span>Month</span>
+            <select id="birth-month" name="birth-month" aria-label="Birth month"></select>
+          </label>
+          <label class="field">
+            <span>Year</span>
+            <select id="birth-year" name="birth-year" aria-label="Birth year"></select>
+          </label>
+        </fieldset>
+      </form>
+    </section>
+
+    <section class="stats" aria-label="Life statistics">
+      <article class="stat-card">
+        <span class="stat-label">Current age</span>
+        <strong id="current-age">0 years</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Weeks lived</span>
+        <strong id="weeks-lived">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Weeks remaining</span>
+        <strong id="weeks-left">4576</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Life used</span>
+        <strong id="life-percent">0%</strong>
+      </article>
+    </section>
+
+    <section class="poster" aria-labelledby="poster-title">
+      <div class="poster-header">
+        <div>
+          <p class="poster-kicker">Weekly map</p>
+          <h2 id="poster-title">A poster-sized view of time</h2>
+        </div>
+        <p class="poster-note" id="poster-note">0 weeks lived, 4576 remaining.</p>
+      </div>
+      <p class="poster-helper" id="poster-helper">
+        Each row represents one year with 52 weeks, and the rows are numbered from 1 to 88.
+      </p>
+
+      <div class="grid-wrapper">
+        <aside class="year-labels" id="year-labels" aria-hidden="true"></aside>
+        <div class="weeks-grid" id="weeks-grid" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
