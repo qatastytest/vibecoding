@@ -262,6 +262,13 @@ function updateBoardFitSize() {
   sudokuGrid.style.height = `${fitSize}px`;
 }
 
+function refreshBoardFitAfterLayoutChange() {
+  updateBoardFitSize();
+  window.requestAnimationFrame(() => {
+    updateBoardFitSize();
+  });
+}
+
 function startGame() {
   if (state.hasStarted) {
     return;
@@ -271,6 +278,7 @@ function startGame() {
   setBoardLocked(false);
   setBoardCompleted(false);
   updateMobilePlayingState();
+  refreshBoardFitAfterLayoutChange();
   startTimer();
   statusText.textContent = "Select an empty cell, then tap a number to place it.";
 }
@@ -532,6 +540,7 @@ function checkWinState() {
   stopTimer();
   setBoardCompleted(true);
   updateMobilePlayingState();
+  refreshBoardFitAfterLayoutChange();
   winTimeLabel.textContent = timerLabel.textContent;
 
   const elapsedSeconds = Math.floor((Date.now() - state.startTime) / 1000);
@@ -571,6 +580,7 @@ function createNewGame() {
   setBoardLocked(true);
   setBoardCompleted(false);
   updateMobilePlayingState();
+  refreshBoardFitAfterLayoutChange();
   renderBoard();
 }
 
