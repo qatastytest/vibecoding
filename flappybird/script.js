@@ -5,9 +5,12 @@ const GAME_HEIGHT = 720;
 const GROUND_HEIGHT = 112;
 const CEILING_HEIGHT = 8;
 const PIPE_WIDTH = 84;
-const PIPE_GAP = 176;
-const PIPE_SPEED = 170;
-const PIPE_SPAWN_INTERVAL = 1.45;
+const BASE_PIPE_GAP = 176;
+const MIN_PIPE_GAP = 136;
+const BASE_PIPE_SPEED = 170;
+const MAX_PIPE_SPEED = 240;
+const BASE_PIPE_SPAWN_INTERVAL = 1.45;
+const MIN_PIPE_SPAWN_INTERVAL = 1.08;
 const GRAVITY = 1450;
 const FLAP_VELOCITY = -420;
 const MAX_DROP_SPEED = 640;
@@ -275,15 +278,38 @@ function endRun() {
 }
 
 function randomPipeGapY() {
-  const minCenter = 180;
-  const maxCenter = GAME_HEIGHT - GROUND_HEIGHT - 190;
+  const currentGap = getCurrentPipeGap();
+  const halfGap = currentGap / 2;
+  const minCenter = 150 + halfGap;
+  const maxCenter = GAME_HEIGHT - GROUND_HEIGHT - 150 - halfGap;
   return minCenter + Math.random() * (maxCenter - minCenter);
 }
 
+function getDifficultyProgress() {
+  return Math.min(state.score / 12, 1);
+}
+
+function getCurrentPipeGap() {
+  const progress = getDifficultyProgress();
+  return BASE_PIPE_GAP - ((BASE_PIPE_GAP - MIN_PIPE_GAP) * progress);
+}
+
+function getCurrentPipeSpeed() {
+  const progress = getDifficultyProgress();
+  return BASE_PIPE_SPEED + ((MAX_PIPE_SPEED - BASE_PIPE_SPEED) * progress);
+}
+
+function getCurrentSpawnInterval() {
+  const progress = getDifficultyProgress();
+  return BASE_PIPE_SPAWN_INTERVAL - ((BASE_PIPE_SPAWN_INTERVAL - MIN_PIPE_SPAWN_INTERVAL) * progress);
+}
+
 function addPipePair() {
+  const currentGap = getCurrentPipeGap();
   state.pipes.push({
     x: GAME_WIDTH + PIPE_WIDTH,
     gapY: randomPipeGapY(),
+    gap: currentGap,
     scored: false,
   });
 }
@@ -390,14 +416,16 @@ function updateClouds(deltaTime) {
 
 function updatePipes(deltaTime) {
   state.spawnTimer += deltaTime;
+  const currentSpawnInterval = getCurrentSpawnInterval();
+  const currentPipeSpeed = getCurrentPipeSpeed();
 
-  if (state.spawnTimer >= PIPE_SPAWN_INTERVAL) {
+  if (state.spawnTimer >= currentSpawnInterval) {
     state.spawnTimer = 0;
     addPipePair();
   }
 
   state.pipes.forEach((pipe) => {
-    pipe.x -= PIPE_SPEED * deltaTime;
+    pipe.x -= currentPipeSpeed * deltaTime;
 
     if (!pipe.scored && pipe.x + PIPE_WIDTH < state.bird.x) {
       pipe.scored = true;
@@ -438,8 +466,8 @@ function checkCollisions() {
   }
 
   for (const pipe of state.pipes) {
-    const topPipeHeight = pipe.gapY - (PIPE_GAP / 2);
-    const bottomPipeY = pipe.gapY + (PIPE_GAP / 2);
+    const topPipeHeight = pipe.gapY - (pipe.gap / 2);
+    const bottomPipeY = pipe.gapY + (pipe.gap / 2);
     const bottomPipeHeight = GAME_HEIGHT - GROUND_HEIGHT - bottomPipeY;
 
     const hitTopPipe = circleRectCollision(
@@ -590,8 +618,8 @@ function drawPipeSegment(x, y, width, height, flipped = false) {
 
 function drawPipes() {
   state.pipes.forEach((pipe) => {
-    const topPipeHeight = pipe.gapY - (PIPE_GAP / 2);
-    const bottomPipeY = pipe.gapY + (PIPE_GAP / 2);
+    const topPipeHeight = pipe.gapY - (pipe.gap / 2);
+    const bottomPipeY = pipe.gapY + (pipe.gap / 2);
     const bottomPipeHeight = GAME_HEIGHT - GROUND_HEIGHT - bottomPipeY;
 
     drawPipeSegment(pipe.x, 0, PIPE_WIDTH, topPipeHeight, true);
