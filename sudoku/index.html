@@ -58,11 +58,11 @@
                 </span>
               </button>
             </div>
+            <button class="primary-button new-game-button" id="new-game-button" type="button">
+              <span class="button-glyph" aria-hidden="true">&#10227;</span>
+              <span>New Game</span>
+            </button>
           </div>
-          <button class="primary-button new-game-button" id="new-game-button" type="button">
-            <span class="button-glyph" aria-hidden="true">&#10227;</span>
-            <span>New Game</span>
-          </button>
         </div>
 
         <div class="stats-row" aria-live="polite">
@@ -78,10 +78,6 @@
             <span class="stat-label">Hints</span>
             <strong id="hints-label">3</strong>
           </div>
-          <button class="secondary-button stat-action-button icon-button" id="undo-button" type="button" aria-label="Undo">
-            <span class="icon-glyph" aria-hidden="true">&#8630;</span>
-            <span class="icon-label">Undo</span>
-          </button>
         </div>
 
         <div class="board-shell">
@@ -94,6 +90,7 @@
               <p class="panel-kicker">Puzzle solved</p>
               <h3>You did it!</h3>
               <p class="win-time">Finished in <strong id="win-time-label">00:00</strong></p>
+              <button class="secondary-button win-action-button" id="play-again-button" type="button">Play Again</button>
             </div>
           </div>
         </div>
@@ -114,6 +111,10 @@
           <button class="secondary-button quick-action-button icon-button accent-button" id="hint-button" type="button" aria-label="Use hint">
             <span class="icon-glyph" aria-hidden="true">?</span>
             <span class="icon-label">Hint</span>
+          </button>
+          <button class="secondary-button quick-action-button icon-button quiet-button" id="undo-button" type="button" aria-label="Undo">
+            <span class="icon-glyph" aria-hidden="true">&#8630;</span>
+            <span class="icon-label">Undo</span>
           </button>
         </div>
         <p class="sr-only" id="status-text">Select an empty cell, then tap a number to place it.</p>
@@ -147,23 +148,23 @@
           <p class="panel-kicker">Best times</p>
           <h3>Saved on this device</h3>
           <div class="best-times-list" id="best-times-list">
-            <div class="best-time-row">
+            <div class="best-time-row" data-best-time-difficulty="very-easy">
               <span>Very Easy</span>
               <strong id="best-time-very-easy">--:--</strong>
             </div>
-            <div class="best-time-row">
+            <div class="best-time-row" data-best-time-difficulty="easy">
               <span>Easy</span>
               <strong id="best-time-easy">--:--</strong>
             </div>
-            <div class="best-time-row">
+            <div class="best-time-row" data-best-time-difficulty="medium">
               <span>Medium</span>
               <strong id="best-time-medium">--:--</strong>
             </div>
-            <div class="best-time-row">
+            <div class="best-time-row" data-best-time-difficulty="advanced">
               <span>Advanced</span>
               <strong id="best-time-advanced">--:--</strong>
             </div>
-            <div class="best-time-row">
+            <div class="best-time-row" data-best-time-difficulty="expert">
               <span>Expert</span>
               <strong id="best-time-expert">--:--</strong>
             </div>

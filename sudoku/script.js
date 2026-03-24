@@ -14,6 +14,7 @@ const sudokuGrid = document.querySelector("#sudoku-grid");
 const boardOverlay = document.querySelector("#board-overlay");
 const winOverlay = document.querySelector("#win-overlay");
 const winTimeLabel = document.querySelector("#win-time-label");
+const playAgainButton = document.querySelector("#play-again-button");
 const startGameButton = document.querySelector("#start-game-button");
 const keypad = document.querySelector("#keypad");
 const difficultyButtons = Array.from(document.querySelectorAll(".difficulty-button"));
@@ -36,6 +37,7 @@ const bestTimeLabels = {
   advanced: document.querySelector("#best-time-advanced"),
   expert: document.querySelector("#best-time-expert"),
 };
+const bestTimeRows = Array.from(document.querySelectorAll("[data-best-time-difficulty]"));
 
 const state = {
   difficulty: "medium",
@@ -83,6 +85,10 @@ function renderBestTimes() {
   Object.entries(bestTimeLabels).forEach(([difficulty, element]) => {
     const bestTime = state.bestTimes[difficulty];
     element.textContent = Number.isFinite(bestTime) ? formatElapsedTime(bestTime) : "--:--";
+  });
+
+  bestTimeRows.forEach((row) => {
+    row.classList.toggle("is-current", row.dataset.bestTimeDifficulty === state.difficulty);
   });
 }
 
@@ -524,6 +530,7 @@ function createNewGame() {
   hintsLabel.textContent = String(state.hintsRemaining);
   updateHintButtonState();
   updateDifficultyLabel();
+  renderBestTimes();
   notesButton.classList.remove("is-active");
   notesButtonLabel.textContent = "Notes";
   highlightButton.classList.toggle("is-active", state.highlightMatches);
@@ -572,6 +579,7 @@ difficultyButtons.forEach((button) => {
 });
 
 newGameButton.addEventListener("click", createNewGame);
+playAgainButton.addEventListener("click", createNewGame);
 
 notesButton.addEventListener("click", () => {
   state.noteMode = !state.noteMode;
