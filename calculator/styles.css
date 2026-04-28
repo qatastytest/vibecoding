@@ -1,0 +1,390 @@
+:root {
+  --bg: #d5e0ec;
+  --panel: #f8f8f8;
+  --panel-strong: #ffffff;
+  --ink: #000000;
+  --muted: #274f80;
+  --line: #9ab2cf;
+  --accent: #0f4277;
+  --accent-soft: #dbe6f2;
+  --utility: #ebeff4;
+  --shadow: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.topbar {
+  background: #113f73;
+  border-bottom: 1px solid #0a2f59;
+}
+
+.topbar-inner {
+  width: min(1040px, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 10px 0 12px;
+}
+
+.brand {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.08rem;
+  font-weight: 700;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.brand span {
+  color: #baf24d;
+}
+
+.page {
+  width: min(1040px, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 16px 0 28px;
+}
+
+.section-label,
+.memory-line {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.section-label {
+  color: #5a79a0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.calculator-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 560px) minmax(250px, 1fr);
+  gap: 26px;
+  align-items: start;
+}
+
+.calculator-shell,
+.card,
+.search-card {
+  background: var(--panel);
+  border: 1px solid #c4d1df;
+  box-shadow: var(--shadow);
+}
+
+.calculator-shell {
+  padding: 28px 18px 18px;
+}
+
+.display-wrap {
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #d2d8df;
+  margin-bottom: 10px;
+}
+
+.display-panel {
+  padding: 8px 12px 6px;
+  background: #3d6f9f;
+  border: 1px solid #587fa7;
+}
+
+.memory-line {
+  color: rgba(255, 255, 255, 0.82);
+  min-height: 14px;
+  text-align: right;
+}
+
+.display {
+  margin-top: 4px;
+  font-size: clamp(2rem, 5vw, 2.25rem);
+  line-height: 1;
+  text-align: right;
+  font-weight: 700;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+}
+
+.utility-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 10px;
+  color: #355981;
+  font-size: 0.78rem;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.key,
+.ghost-button {
+  border: 1px solid #8eabd0;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.key {
+  min-height: 34px;
+  border-radius: 3px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #d4e2f0;
+}
+
+.key:hover,
+.ghost-button:hover {
+  background: #c4d7eb;
+}
+
+.key:active,
+.ghost-button:active,
+.key.is-pressed {
+  background: #b7cce3;
+}
+
+.key:focus-visible,
+.ghost-button:focus-visible {
+  outline: 1px solid #1e5087;
+  outline-offset: 1px;
+}
+
+.utility {
+  background: #edf2f8;
+}
+
+.operator {
+  background: #e8eef5;
+}
+
+.accent {
+  background: #d9e6f5;
+  color: #000000;
+  border-color: #8eabd0;
+}
+
+.zero {
+  grid-column: span 2;
+}
+
+.shortcut-note {
+  margin: 10px 0 0;
+  color: #4c6888;
+  font-size: 0.76rem;
+}
+
+.ghost-button {
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 3px;
+  background: #edf2f8;
+  color: #000000;
+}
+
+.small-button {
+  min-width: 62px;
+}
+
+.info-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.search-card {
+  padding: 14px 16px 18px;
+}
+
+.search-card h1 {
+  margin: 0 0 12px;
+  color: #073b79;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-field {
+  height: 28px;
+  background: #ffffff;
+  border: 1px solid #2f5d94;
+}
+
+.search-button {
+  min-width: 68px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: #1d63ad;
+  border: 1px solid #174e87;
+  font-weight: 400;
+}
+
+.card {
+  padding: 14px 16px 16px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.history-actions {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.history-count {
+  font-size: 0.75rem;
+  color: #2a4f7d;
+  font-weight: 600;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 4px;
+}
+
+.history-item,
+.history-empty {
+  border-radius: 0;
+  padding: 8px 10px;
+  background: #f7faff;
+  border: 1px solid #9db9dd;
+}
+
+.history-item-expression,
+.history-item-result {
+  display: block;
+}
+
+.history-item-result {
+  margin-top: 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #103f78;
+}
+
+.history-empty {
+  color: #537194;
+}
+
+.history-card {
+  background: #d8e4f2;
+  border-color: #b7cadf;
+}
+
+.history-card .section-label {
+  color: #2b588a;
+}
+
+.history-card h2 {
+  margin: 2px 0 0;
+  color: #0f396f;
+  font-size: 1rem;
+}
+
+.history-card .ghost-button {
+  background: #1f66b1;
+  color: #ffffff;
+  border-color: #165796;
+  border-radius: 0;
+  min-height: 28px;
+  padding: 4px 10px;
+}
+
+.history-card .ghost-button:hover {
+  background: #195899;
+}
+
+.history-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.history-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: #3b6ea5;
+}
+
+.history-item-expression {
+  padding-left: 10px;
+  color: #304d6e;
+  font-family: Arial, sans-serif;
+  font-size: 0.83rem;
+}
+
+.history-item-result {
+  padding-left: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.history-clear-button {
+  box-shadow: none;
+}
+
+@media (max-width: 920px) {
+  .calculator-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    width: min(100vw - 16px, 100%);
+    padding: 12px 0 20px;
+  }
+
+  .topbar-inner {
+    width: min(100vw - 16px, 100%);
+  }
+
+  .calculator-shell,
+  .card,
+  .search-card {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .key {
+    min-height: 38px;
+  }
+
+  .history-header {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .history-actions {
+    justify-items: start;
+  }
+}

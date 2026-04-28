@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="./">Calculator<span>.net</span></a>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="calculator-layout">
+      <article class="calculator-shell" aria-label="Calculator">
+        <div class="display-wrap">
+          <div class="display-panel">
+            <p class="memory-line" id="memory-line">Ready</p>
+            <div class="display" id="display" aria-live="polite">0</div>
+          </div>
+        </div>
+
+        <div class="utility-strip">
+          <span>Free online calculator</span>
+          <button class="ghost-button small-button" type="button" id="backspace-button">Back</button>
+        </div>
+
+        <div class="keypad" aria-label="Calculator keys">
+          <button class="key utility" type="button" data-action="clear">AC</button>
+          <button class="key utility" type="button" data-action="sign">+/-</button>
+          <button class="key utility" type="button" data-action="percent">%</button>
+          <button class="key operator" type="button" data-action="operator" data-value="/">/</button>
+
+          <button class="key" type="button" data-action="digit" data-value="7">7</button>
+          <button class="key" type="button" data-action="digit" data-value="8">8</button>
+          <button class="key" type="button" data-action="digit" data-value="9">9</button>
+          <button class="key operator" type="button" data-action="operator" data-value="*">x</button>
+
+          <button class="key" type="button" data-action="digit" data-value="4">4</button>
+          <button class="key" type="button" data-action="digit" data-value="5">5</button>
+          <button class="key" type="button" data-action="digit" data-value="6">6</button>
+          <button class="key operator" type="button" data-action="operator" data-value="-">-</button>
+
+          <button class="key" type="button" data-action="digit" data-value="1">1</button>
+          <button class="key" type="button" data-action="digit" data-value="2">2</button>
+          <button class="key" type="button" data-action="digit" data-value="3">3</button>
+          <button class="key operator" type="button" data-action="operator" data-value="+">+</button>
+
+          <button class="key zero" type="button" data-action="digit" data-value="0">0</button>
+          <button class="key" type="button" data-action="decimal">.</button>
+          <button class="key accent" type="button" data-action="equals">=</button>
+        </div>
+
+        <p class="shortcut-note">Keyboard: digits, operators, Enter, Backspace, Esc</p>
+      </article>
+
+      <aside class="info-panel">
+        <section class="search-card">
+          <h1>Free Online Calculators</h1>
+          <div class="search-row" aria-hidden="true">
+            <div class="search-field"></div>
+            <div class="search-button">Search</div>
+          </div>
+        </section>
+
+        <section class="card history-card">
+          <div class="history-header">
+            <div>
+              <p class="section-label">Recent history</p>
+              <h2>Last calculations</h2>
+            </div>
+            <div class="history-actions">
+              <span class="history-count" id="history-count">0 saved</span>
+              <button class="ghost-button history-clear-button" type="button" id="clear-history-button">Clear</button>
+            </div>
+          </div>
+          <ul class="history-list" id="history-list">
+            <li class="history-empty">No calculations yet.</li>
+          </ul>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
